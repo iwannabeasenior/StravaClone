@@ -23,8 +23,10 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
   late List<Map<String, dynamic>> run = [];
   final db = FirebaseFirestore.instance;
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -65,7 +67,7 @@ class _HomeState extends State<Home> {
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [
                             Text('distance : ${run[index]['distance']}'),
-                            Text('speed : ${run[index]['speed']}'),
+                            Text('speed : ${run[index]['speed']} km/h'),
                             Text('time : ${run[index]['time']}'),
                           ],
                         )
@@ -74,20 +76,20 @@ class _HomeState extends State<Home> {
                   );
                 },
               childCount: run.length
-
             ),
           )
         ],
       )
     );
   }
+
   @override
   void initState() {
     super.initState();
     fetch();
   }
-  void fetch() {
 
+  void fetch() {
     db.collection('information').get().then((event) {
       for (var doc in event.docs) {
         run.add(doc.data());

@@ -1,14 +1,11 @@
 
 import 'dart:async';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'firebase_options.dart';
-import 'home.dart';
 
 class MyMap extends StatefulWidget {
   MyMap({super.key});
@@ -22,7 +19,6 @@ class _MyMapState extends State<MyMap> {
   late GoogleMapController controllerMap;
   final timeclock = StopWatchTimer();
   String dis  = '0.00 km';
-  String speed = '0';
   bool start = false;
   DistanceCalculator distance = DistanceCalculator();
   List<LatLng> points = [];
@@ -31,13 +27,9 @@ class _MyMapState extends State<MyMap> {
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   final _db = FirebaseFirestore.instance;
   @override
-  void initState() {
+  void initState()  {
     super.initState();
     checkPermision();
-    // draw();
-  }
-  Future<void> draw() async {
-    await routes.drawRoute(points, "RouteMap", Colors.red, "AIzaSyA3U7GWwoEJdgdIAoKU-CRejRmDR0z1Pac", travelMode : TravelModes.bicycling);
   }
   @override
   Widget build(BuildContext context) {
@@ -110,6 +102,7 @@ class _MyMapState extends State<MyMap> {
 
 
         bottomNavigationBar: BottomAppBar(
+          color: Colors.amber,
           height: 200,
             child : StreamBuilder(
             stream: timeclock.rawTime ,
@@ -125,27 +118,39 @@ class _MyMapState extends State<MyMap> {
                       children: [
                         Padding(
                           padding: EdgeInsets.all(2),
+                          child: Container(
+                            color: Colors.lightGreenAccent,
+                            height: 20,
+                            child: Text(
+                                'Time : $displayTime',
+                                style : TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 15
+                                )
+                            ),
+                          ),
+                        ),
+                        Container(
+                          height: 20,
+                          color: Colors.lightGreenAccent,
                           child: Text(
-                              displayTime,
-                              style : TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 15
+                            'Distance : $dis',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 15,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          color : Colors.lightGreenAccent,
+                          height: 20,
+                          child: Text(
+                              'Speed : ${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold
                               )
                           ),
-                        ),
-                        Text(
-                          dis,
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
-                          ),
-                        ),
-                        Text(
-                            '${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h',
-                            style: TextStyle(
-                                fontSize: 15,
-                                fontWeight: FontWeight.bold
-                            )
                         ),
                       ],
                     ),
