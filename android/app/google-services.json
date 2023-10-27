@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "796992721580",
+    "project_id": "stravaproject-402809",
+    "storage_bucket": "stravaproject-402809.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:796992721580:android:fbba8c7839be2b8684c509",
+        "android_client_info": {
+          "package_name": "com.example.stravaclone"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCi6bmxcYTloTfLNAjkaSokmlkhB2DxSXw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
