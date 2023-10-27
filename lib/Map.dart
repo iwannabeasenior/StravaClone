@@ -10,35 +10,6 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'firebase_options.dart';
 import 'home.dart';
 
-// class Home extends StatefulWidget {
-//   const Home({super.key});
-//
-//   @override
-//   State<Home> createState() => _HomeState();
-// }
-//
-// class _HomeState extends State<Home> {
-//   @override
-//   Widget build(BuildContext context) {
-//     return Scaffold(
-//
-//       appBar: AppBar(
-//         title: const Text("Strava Home"),
-//       ),
-//       floatingActionButton: FloatingActionButton(
-//         onPressed: () {
-//           Navigator.push(context, MaterialPageRoute(
-//             builder: (context) {
-//               return  MyMap();
-//             }
-//           ));
-//         },
-//         child : const Icon(Icons.run_circle, color : Colors.blue)
-//       ),
-//       body : Container(color : Colors.amber)
-//     );
-//   }
-// }
 class MyMap extends StatefulWidget {
   MyMap({super.key});
 
