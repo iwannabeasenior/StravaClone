@@ -122,6 +122,8 @@ class _HomeState extends State<Home> {
         run.add(doc.data());
       }
     }
-    );
+    ).then((value) {
+      setState(() {});
+    });
   }
 }
