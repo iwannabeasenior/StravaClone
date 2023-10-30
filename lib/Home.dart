@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'firebase_options.dart';
 import 'Map.dart';
 
@@ -62,7 +63,33 @@ class _HomeState extends State<Home> {
                   return Container(
                     child: Column(
                       children: [
-                        Image(image : AssetImage('asset/image/map.png')),
+                        GestureDetector(
+                          onTap : () {
+                            Navigator.push(context, MaterialPageRoute(
+                                builder: (context) {
+                                  List<LatLng> list = [];
+                                  for (var cordinate in run[index]['path']) {
+                                    list.add(LatLng(cordinate.latitude, cordinate.longitude));
+                                  }
+
+                                  return GoogleMap(
+                                      initialCameraPosition: CameraPosition(
+                                          target: list.isEmpty ? LatLng(0,0) : LatLng(list[0].latitude, list[0].longitude),
+                                          zoom: 18
+                                      ),
+                                      polylines: {
+                                        Polyline(
+                                          polylineId: PolylineId('A'),
+                                          points: list,
+                                          color : Colors.red,
+                                        )
+                                      }
+                                  );
+                                }));
+                          },
+                          child: Image(image : AssetImage('asset/image/map.png'),
+                          ),
+                        ),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: [

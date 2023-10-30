@@ -15,14 +15,15 @@ class MyMap extends StatefulWidget {
 }
 
 class _MyMapState extends State<MyMap> {
+  final Set<Polyline> _polyline = {};
   MapType _currentMapType = MapType.normal;
   late GoogleMapController controllerMap;
   final timeclock = StopWatchTimer();
   String dis  = '0.00 km';
   bool start = false;
   DistanceCalculator distance = DistanceCalculator();
-  List<LatLng> points = [];
-  LatLng? currentLocation = null;
+  final List<LatLng> points = [];
+  LatLng currentLocation = LatLng(0, 0);
   MapsRoutes routes = MapsRoutes();
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   final _db = FirebaseFirestore.instance;
@@ -30,16 +31,23 @@ class _MyMapState extends State<MyMap> {
   void initState()  {
     super.initState();
     checkPermision();
+    _polyline.add(
+      Polyline(
+        polylineId: PolylineId('A'),
+        points: points,
+        color: Colors.red,
+      )
+    );
   }
   @override
   Widget build(BuildContext context) {
-    return currentLocation == null ? const Center(child: Text('nothing to show')) :
+    return currentLocation == null ? const Scaffold(body : Center(child: Text('Waiting...', textAlign: TextAlign.center,))) :
        Scaffold(
         body : Stack(
           children: [
             GoogleMap(
               initialCameraPosition:  CameraPosition(
-                  zoom: 15,
+                  zoom: 30,
                   target: currentLocation!),
               markers: { Marker(
                 position: currentLocation!,
@@ -56,6 +64,8 @@ class _MyMapState extends State<MyMap> {
               zoomControlsEnabled: true,
               myLocationEnabled:  true,
               mapType: _currentMapType,
+              polylines: _polyline,
+              compassEnabled: true,
               // polylines: routes.routes
             ),
             Align(
@@ -108,7 +118,7 @@ class _MyMapState extends State<MyMap> {
             stream: timeclock.rawTime ,
             builder: (context, snap) {
               final value = snap.data;
-              final displayTime = StopWatchTimer.getDisplayTime(value!);
+              final displayTime = (value != null) ? StopWatchTimer.getDisplayTime(value!) : '00:00:00';
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -145,7 +155,7 @@ class _MyMapState extends State<MyMap> {
                           color : Colors.lightGreenAccent,
                           height: 20,
                           child: Text(
-                              'Speed : ${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h',
+                              (value != null) ? 'Speed : ${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value!.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h' : 'Speed : 0.00 km/h',
                               style: TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
@@ -165,7 +175,11 @@ class _MyMapState extends State<MyMap> {
                         } else {
                           timeclock.onStopTimer();
                           start = false;
-                          final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime};
+                          List<GeoPoint> path = [];
+                          for (LatLng latlng in points) {
+                            path.add(GeoPoint(latlng.latitude, latlng.longitude));
+                          }
+                          final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime, 'path' : path};
                           await _db.collection('information').add(user);
                           Navigator.pop(context, user);
                         }
@@ -186,7 +200,7 @@ class _MyMapState extends State<MyMap> {
   Future<void> cameraPositionChange(LatLng pos) async {
 
     controllerMap = await _controller.future;
-    CameraPosition cameraPosition = CameraPosition(target: pos, zoom : 15);
+    CameraPosition cameraPosition = CameraPosition(target: pos, zoom : 30);
     await controllerMap.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
@@ -209,13 +223,27 @@ class _MyMapState extends State<MyMap> {
         return ;
       }
     }
-    locationData = await location.getLocation();
+    locationData = await location.getLocation().then(
+        (value) {
+           currentLocation = LatLng(value.latitude!, value.longitude!);
+           setState(() {
+           });
+           return value;
+        }
+    );
 
     location.onLocationChanged.listen((LocationData locationData) async {
       currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
         if (start) {
           points.add(currentLocation!);
-          await routes.drawRoute(points, "RouteMap", Colors.red, "AIzaSyA3U7GWwoEJdgdIAoKU-CRejRmDR0z1Pac");
+          _polyline.add(
+              Polyline(
+                polylineId: PolylineId('A'),
+                points: points,
+                color: Colors.red,
+              )
+          );
+          // await routes.drawRoute(points, "RouteMap", Colors.red, "AIzaSyA3U7GWwoEJdgdIAoKU-CRejRmDR0z1Pac");
           dis = distance.calculateRouteDistance(points, decimals: 2);
         }
       if (_controller.isCompleted) await cameraPositionChange(currentLocation!);
