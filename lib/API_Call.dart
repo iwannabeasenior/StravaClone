@@ -1,22 +1,32 @@
 import 'dart:convert';
 import 'dart:io';
+// import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:strava_client/strava_client.dart';
+import 'package:url_launcher/url_launcher.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  StravaClient stravaClient = StravaClient(secret: '3c0c197b80c0daff7681457c46724c51562b2c00', clientId: '115822');
-  stravaClient.authentication.authenticate(scopes: [AuthenticationScope.activity_read_all, AuthenticationScope.activity_write], redirectUrl:'http://localhost:58817', callbackUrlScheme: 'localhost:58817');
-  // stravaClient.uploads.uploadActivity(UploadActivityRequest())
-  ActivityStats stat = await stravaClient.athletes.getAthleteStats(126207203);
-  print(stat.allRunTotals?.distance);
+
+  }
   
+
+  // stravaClient.uploads.uploadActivity(UploadActivityRequest())
+  // ActivityStats stat = await stravaClient.athletes.getAthleteStats(126207203);
+  // print(stat.allRunTotals?.distance);
+  // final _url = Uri.parse('http://www.strava.com/oauth/authorize?client_id=115822&response_type=code&redirect_uri=http://localhost/exchange_token&approval_prompt=force&scope=activity:read_all');
+  // await launchUrl(_url);
+  // take code
+
+
+
+  //
   // final result = await fetchActivity();
   // result.forEach((key, value) {
   //   print(key);
   //   print(value);
   // });
-}
+
 // Future<http.Response> createAlbum(String title) {
 //   return http.post(
 //     Uri.parse('https://strava.com/api/v3/activities'),
@@ -34,11 +44,12 @@ void main() async {
 //   );
 // }
 // get data
-Future<Map<String, dynamic>> fetchActivity() async {
-  return jsonDecode(await http.get(
-      Uri.parse('https://www.strava.com/api/v3/athlete?access_token=e94549e98d4bba52f7d2c049864139484c0b8c81'),
-      // headers: {
-      //   HttpHeaders.authorizationHeader : 'Bearer e94549e98d4bba52f7d2c049864139484c0b8c81',
-      // }
-  ).then((value) => value.body));
-}
+// Future<Map<String, dynamic>> fetchActivity() async {
+//   return jsonDecode(await http.get(
+//       Uri.parse('https://www.strava.com/api/v3/athlete?access_token=e94549e98d4bba52f7d2c049864139484c0b8c81'),
+//       // headers: {
+//       //   HttpHeaders.authorizationHeader : 'Bearer e94549e98d4bba52f7d2c049864139484c0b8c81',
+//       // }
+//
+//   ).then((value) => value.body));
+// }

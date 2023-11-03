@@ -186,7 +186,6 @@ class _MyMapState extends State<MyMap> {
 
                       }, child: Icon(start ? Icons.stop : Icons.not_started_outlined )),
                     ),
-
                   ],
                 ),
               );
