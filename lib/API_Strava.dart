@@ -3,14 +3,18 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
+import 'package:lecle_downloads_path_provider/lecle_downloads_path_provider.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:strava_client/strava_client.dart';
+import 'package:http_parser/http_parser.dart';
+
 
 // https thay vì parse vì https có thể thêm body, rất cần cho phương thức get ( đỡ phải viết parse'... dài dòng')
 // mỗi url2 là cần thêm /api/v3 : lý do thì vẫn chưa tìm ra, maybe phương thức 'get' là cần , còn post và cái các khác là không
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(
-      MaterialApp(
+      const MaterialApp(
         home: MyApp(),
       )
   );
@@ -27,7 +31,7 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text('My page')),
+        title: const Center(child: Text('My page')),
       ),
       body : Center(
         child : ElevatedButton(
@@ -36,8 +40,9 @@ class _MyAppState extends State<MyApp> {
             TokenResponse tokenResponse = await stravaClient.authentication.authenticate(scopes: [AuthenticationScope.activity_read_all, AuthenticationScope.activity_write], redirectUrl:"stravaflutter://redirect", callbackUrlScheme:"stravaflutter");
             String accessToken = tokenResponse.accessToken;
             String refreshToken = tokenResponse.refreshToken;
+            print(accessToken);
           },
-          child : Icon(Icons.add)
+          child : const Icon(Icons.add)
         )
       ),
       floatingActionButton: FloatingActionButton(
@@ -51,6 +56,7 @@ class _MyAppState extends State<MyApp> {
           });
 
           final result = await FlutterWebAuth2.authenticate(url: url.toString(), callbackUrlScheme: 'stravaflutter');
+          print('result is $result');
           final code = Uri.parse(result).queryParameters['code'];
           final url1 = Uri.https('www.strava.com', '/api/v3/oauth/token');
 
@@ -61,7 +67,7 @@ class _MyAppState extends State<MyApp> {
             'code' : code,
           });
           final accessToken = jsonDecode(response.body)['access_token'] as String;
-          print('token is :' + accessToken);
+          print('token is :$accessToken');
           // ok done , i have accesstoken and refreshtoken, hehe, continue
 
           final url2 = Uri.https('www.strava.com', '/api/v3/athlete/activities');
@@ -70,24 +76,53 @@ class _MyAppState extends State<MyApp> {
             HttpHeaders.authorizationHeader : 'Bearer $accessToken'
             }
           );
-          // final response2 = await http.get(Uri.parse('https://www.strava.com/api/v3/athlete/activities?access_token=$accessToken'),
-          //               headers: {
-          //                             HttpHeaders.authorizationHeader : 'Bearer $accessToken'
-          //               });
-
           // final data = jsonDecode(response2.body) as List<dynamic>;
           // data.forEach((element) {
           //   print(element);
           // });
 
 
-          final url3 = Uri.https('www.strava.com', '/api/v3/uploads');
-          final response3 = await http.post(url3,
-          headers: {
-            HttpHeaders.authorizationHeader : 'Bearer $accessToken'
-          },
-          body : {
-            'file' : '/C:\\Users\\NguyenTrungThanh\\Downloads\\gpxgenerator_path.gpx/to/gpxgenerator_path.gpx"',
+          // final response2 = await http.get(Uri.parse('https://www.strava.com/api/v3/athlete/activities?access_token=$accessToken'),
+          //               headers: {
+          //                             HttpHeaders.authorizationHeader : 'Bearer $accessToken'
+          //               });
+
+
+
+
+          // final url3 = Uri.https('www.strava.com', '/api/v3/uploads');
+          // final response3 = await http.post(url3,
+          // headers: {
+          //   HttpHeaders.authorizationHeader : 'Bearer $accessToken'
+          // },
+          // body : {
+          //   'file' : '/storage/emulated/0/Download/gpxgenerator_path.gpx',
+          //   'name' : 'My activity',
+          //   'description' : 'Can i run from home to my school ?',
+          //   'trainer' : 'no',
+          //   'commute' : 'no',
+          //   'data_type' : 'gpx',
+          //   'external_id' : '342341224',
+          // });
+          // print(response3.toString());
+          // print(response3.body);
+          // upload activity by ChatGPT
+
+          Directory? downloadsDirectory = await DownloadsPath.downloadsDirectory();
+          String? downloadsDirectoryPath = (await DownloadsPath.downloadsDirectory())?.path;
+          print(downloadsDirectoryPath);
+          var status = await Permission.storage.request();
+
+          final uploadUrl = Uri.parse('https://www.strava.com/api/v3/uploads');
+          final request = http.MultipartRequest('POST', uploadUrl)
+          ..headers['Authorization'] = 'Bearer $accessToken'
+          ..files.add(
+            await http.MultipartFile.fromPath(
+                'file',
+                '$downloadsDirectoryPath/track.gpx',
+                contentType: MediaType('application', 'gpx+xml')
+            ))
+          ..fields.addAll({
             'name' : 'My activity',
             'description' : 'Can i run from home to my school ?',
             'trainer' : 'no',
@@ -95,12 +130,17 @@ class _MyAppState extends State<MyApp> {
             'data_type' : 'gpx',
             'external_id' : '342341224',
           });
-          print(response3.toString());
-          print(response3.body);
-          // print('complete');
+
+          final responseUpload = await request.send();
+          if (responseUpload.statusCode == 201) {
+            print('success');
+          } else {
+            print('fail');
+          }
+          print('complete');
           // assert(data is List<Map<dynamic, dynamic>>);
         },
-        child : Icon(Icons.auto_awesome)
+        child : const Icon(Icons.auto_awesome)
       ),
     );
   }

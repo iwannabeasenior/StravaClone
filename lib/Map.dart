@@ -23,7 +23,7 @@ class _MyMapState extends State<MyMap> {
   bool start = false;
   DistanceCalculator distance = DistanceCalculator();
   final List<LatLng> points = [];
-  LatLng currentLocation = LatLng(0, 0);
+  LatLng? currentLocation;
   MapsRoutes routes = MapsRoutes();
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   final _db = FirebaseFirestore.instance;
@@ -38,6 +38,11 @@ class _MyMapState extends State<MyMap> {
         color: Colors.red,
       )
     );
+  }
+  @override
+  void dispose() {
+    super.dispose();
+    controllerMap.dispose();
   }
   @override
   Widget build(BuildContext context) {
