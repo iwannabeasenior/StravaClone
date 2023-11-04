@@ -23,6 +23,8 @@ class _MyMapState extends State<MyMap> {
   bool start = false;
   DistanceCalculator distance = DistanceCalculator();
   final List<LatLng> points = [];
+  final List<String> timeIso = [];
+  final List<String> times = [];
   LatLng? currentLocation;
   MapsRoutes routes = MapsRoutes();
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
@@ -184,7 +186,7 @@ class _MyMapState extends State<MyMap> {
                           for (LatLng latlng in points) {
                             path.add(GeoPoint(latlng.latitude, latlng.longitude));
                           }
-                          final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime, 'path' : path};
+                          final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime, 'path' : path, 'timeISO' : timeIso};
                           await _db.collection('information').add(user);
                           Navigator.pop(context, user);
                         }
@@ -240,6 +242,7 @@ class _MyMapState extends State<MyMap> {
       currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
         if (start) {
           points.add(currentLocation!);
+          timeIso.add(DateTime.now().toUtc().toIso8601String());
           _polyline.add(
               Polyline(
                 polylineId: PolylineId('A'),

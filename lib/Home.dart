@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:stravaclone/garbage/GenerateGPXFile.dart';
 import 'firebase_options.dart';
 import 'Map.dart';
 
@@ -50,6 +51,11 @@ class _HomeState extends State<Home> {
               }));
           setState(() {
             run.add(user);
+            List<LatLng> list = [];
+            for (var cordinate in user['path']) {
+              list.add(LatLng(cordinate.latitude, cordinate.longitude));
+            }
+            var file = createGPXFile(list, user['timeISO']);
           });
         },
         child : Icon(Icons.run_circle,
