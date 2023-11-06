@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:stravaclone/garbage/GenerateGPXFile.dart';
+import 'package:stravaclone/API.dart';
+import 'GenerateGPXFile.dart';
 import 'firebase_options.dart';
 import 'Map.dart';
 
@@ -11,7 +12,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     home : Home(),
   ));
@@ -34,7 +35,7 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.black12,
-        title: Center(
+        title: const Center(
           child: Text('Your routes',style: TextStyle(
             color: Colors.greenAccent,
             fontWeight: FontWeight.bold,
@@ -47,18 +48,19 @@ class _HomeState extends State<Home> {
         onPressed: () async {
           final user = await Navigator.push(context, MaterialPageRoute(
               builder: (context) {
-                return MyMap();
+                return const MyMap();
               }));
-          setState(() {
+          List<LatLng> list = [];
+          for (var cordinate in user['path']) {
+            list.add(LatLng(cordinate.latitude, cordinate.longitude));
+          }
+          await createGPXFile(list, user['timeISO']);
+          await APICall();
+          setState(()  {
             run.add(user);
-            List<LatLng> list = [];
-            for (var cordinate in user['path']) {
-              list.add(LatLng(cordinate.latitude, cordinate.longitude));
-            }
-            var file = createGPXFile(list, user['timeISO']);
           });
         },
-        child : Icon(Icons.run_circle,
+        child : const Icon(Icons.run_circle,
         color: Colors.amber,)
       ),
       body : CustomScrollView(
@@ -85,7 +87,7 @@ class _HomeState extends State<Home> {
                                       ),
                                       polylines: {
                                         Polyline(
-                                          polylineId: PolylineId('A'),
+                                          polylineId: const PolylineId('A'),
                                           points: list,
                                           color : Colors.red,
                                         )
@@ -93,7 +95,7 @@ class _HomeState extends State<Home> {
                                   );
                                 }));
                           },
-                          child: Image(image : AssetImage('asset/image/map.png'),
+                          child: const Image(image : AssetImage('asset/image/map.png'),
                           ),
                         ),
                         Row(

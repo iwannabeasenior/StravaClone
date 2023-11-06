@@ -1,15 +1,14 @@
-import 'package:flutter/material.dart';
+
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:xml/xml.dart';
 import 'dart:io';
 
-File createGPXFile(List<LatLng> points, List<String> timeISO) {
+Future<void> createGPXFile(List<LatLng> points, List<String> timeISO) async {
   final gpx = XmlDocument([
     XmlProcessing('xml', 'version="1.0" encoding="UTF-8"'),
     XmlElement(
       XmlName('gpx'),
       [
-        XmlAttribute(XmlName('version'), '1.1'),
         XmlAttribute(XmlName('creator'), 'StravaGPX iPhone'),
         XmlAttribute(XmlName('xmlns:xsi'), 'http://www.w3.org/2001/XMLSchema-instance'),
         XmlAttribute(XmlName('xsi:schemaLocation'), 'http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd'),
@@ -26,10 +25,33 @@ File createGPXFile(List<LatLng> points, List<String> timeISO) {
             XmlElement(
               XmlName('time'),
               [],
-              [XmlCDATA(timeISO[0])]
+              [
+                XmlText(timeISO[0])
+              ]
+            ),
+            XmlElement(
+              XmlName('name'),
+              [],
+              [XmlText('trackGPS')]
+            ),
+            XmlElement(
+              XmlName('author'),
+              [],
+              [
+                XmlElement(
+                  XmlName('name'),
+                  [],
+                  [XmlText('gpx.studio')]
+                ),
+                XmlElement(
+                  XmlName('link'),
+                  [XmlAttribute(XmlName('href'), 'https://gpx.studio')]
+                )
+              ]
             )
           ]
         ),
+
         XmlElement(
           XmlName('trk'),
           [],
@@ -38,13 +60,13 @@ File createGPXFile(List<LatLng> points, List<String> timeISO) {
               XmlName('name'),
               [],
               [
-                XmlCDATA('Lunch SnowBoard'),
+                XmlText('Lunch SnowBoard'),
               ]
             ),
             XmlElement(
               XmlName('type'),
               [],
-              [XmlCDATA('Snowboard')]
+              [XmlText('Running')]
             ),
             XmlElement(
               XmlName('trkseg'),
@@ -54,20 +76,20 @@ File createGPXFile(List<LatLng> points, List<String> timeISO) {
                   XmlElement(
                     XmlName('trkpt'),
                     [
-                      XmlAttribute(XmlName('lat'), points[i].latitude.toString()),
-                      XmlAttribute(XmlName('lon'), points[i].longitude.toString()),
+                      XmlAttribute(XmlName('lat'), points[i].latitude.toStringAsFixed(6)),
+                      XmlAttribute(XmlName('lon'), points[i].longitude.toStringAsFixed(6)),
                     ],
                     [
                       XmlElement(
                         XmlName('ele'),
                         [],
-                        [XmlCDATA('10')],
+                        [XmlText('6.6')],
                       ),
                       XmlElement(
                         XmlName('time'),
                         [],
                         [
-                          XmlCDATA(timeISO[i])
+                          XmlText(timeISO[i])
                         ],
                       )
                     ]
@@ -80,8 +102,9 @@ File createGPXFile(List<LatLng> points, List<String> timeISO) {
       ],
     )
   ]);
+
+
   final gpxString = gpx.toXmlString(pretty: true);
-  final file = File('path of file wanna save');
+  final file = File('/storage/emulated/0/Download/gpxFake.gpx');
   file.writeAsStringSync(gpxString);
-  return file;
 }

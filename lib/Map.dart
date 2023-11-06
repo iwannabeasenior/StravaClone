@@ -8,7 +8,7 @@ import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class MyMap extends StatefulWidget {
-  MyMap({super.key});
+  const MyMap({super.key});
 
   @override
   State<MyMap> createState() => _MyMapState();
@@ -17,8 +17,8 @@ class MyMap extends StatefulWidget {
 class _MyMapState extends State<MyMap> {
   final Set<Polyline> _polyline = {};
   MapType _currentMapType = MapType.normal;
-  late GoogleMapController controllerMap;
-  final timeclock = StopWatchTimer();
+  late GoogleMapController controllerMap ;
+  final timeClock = StopWatchTimer();
   String dis  = '0.00 km';
   bool start = false;
   DistanceCalculator distance = DistanceCalculator();
@@ -35,7 +35,7 @@ class _MyMapState extends State<MyMap> {
     checkPermision();
     _polyline.add(
       Polyline(
-        polylineId: PolylineId('A'),
+        polylineId: const PolylineId('A'),
         points: points,
         color: Colors.red,
       )
@@ -48,7 +48,7 @@ class _MyMapState extends State<MyMap> {
   }
   @override
   Widget build(BuildContext context) {
-    return currentLocation == null ? const Scaffold(body : Center(child: Text('Waiting...', textAlign: TextAlign.center,))) :
+    return currentLocation == null ? const Scaffold(body : Center(child: Text('Waiting for creating map...', textAlign: TextAlign.center,))) :
        Scaffold(
         body : Stack(
           children: [
@@ -78,7 +78,7 @@ class _MyMapState extends State<MyMap> {
             Align(
               alignment: Alignment.centerRight,
               child : PopupMenuButton(
-                child : Icon(Icons.layers, size: 50, color: Colors.black38),
+                child : const Icon(Icons.layers, size: 50, color: Colors.black38),
                 onSelected: (value) {
                   if (value == TypeMap.Standard) {
                     _currentMapType = MapType.normal;
@@ -99,16 +99,16 @@ class _MyMapState extends State<MyMap> {
                 },
                 itemBuilder: (context) => const [
                   PopupMenuItem(
-                      child: Text('Standard'),
-                      value : TypeMap.Standard
+                      value : TypeMap.Standard,
+                      child: Text('Standard')
                   ),
                   PopupMenuItem(
-                      child: Text('Satellite'),
-                      value : TypeMap.Satellite
+                      value : TypeMap.Satellite,
+                      child: Text('Satellite')
                   ),
                   PopupMenuItem(
-                      child: Text('Hybrid'),
-                      value : TypeMap.Hybrid
+                      value : TypeMap.Hybrid,
+                      child: Text('Hybrid')
                   )
                 ]
               )
@@ -122,7 +122,7 @@ class _MyMapState extends State<MyMap> {
           color: Colors.amber,
           height: 200,
             child : StreamBuilder(
-            stream: timeclock.rawTime ,
+            stream: timeClock.rawTime ,
             builder: (context, snap) {
               final value = snap.data;
               final displayTime = (value != null) ? StopWatchTimer.getDisplayTime(value!) : '00:00:00';
@@ -140,7 +140,7 @@ class _MyMapState extends State<MyMap> {
                             height: 20,
                             child: Text(
                                 'Time : $displayTime',
-                                style : TextStyle(
+                                style : const TextStyle(
                                     fontWeight: FontWeight.bold,
                                     fontSize: 15
                                 )
@@ -152,7 +152,7 @@ class _MyMapState extends State<MyMap> {
                           color: Colors.lightGreenAccent,
                           child: Text(
                             'Distance : $dis',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 15,
                             ),
@@ -163,7 +163,7 @@ class _MyMapState extends State<MyMap> {
                           height: 20,
                           child: Text(
                               (value != null) ? 'Speed : ${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value!.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h' : 'Speed : 0.00 km/h',
-                              style: TextStyle(
+                              style: const TextStyle(
                                   fontSize: 15,
                                   fontWeight: FontWeight.bold
                               )
@@ -175,12 +175,12 @@ class _MyMapState extends State<MyMap> {
                     Center(
                       child: ElevatedButton(onPressed: ()  async {
                         if (!start) {
-                          timeclock.onStartTimer();
+                          timeClock.onStartTimer();
                           setState(() {
                             start = true;
                           });
                         } else {
-                          timeclock.onStopTimer();
+                          timeClock.onStopTimer();
                           start = false;
                           List<GeoPoint> path = [];
                           for (LatLng latlng in points) {
@@ -188,6 +188,7 @@ class _MyMapState extends State<MyMap> {
                           }
                           final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime, 'path' : path, 'timeISO' : timeIso};
                           await _db.collection('information').add(user);
+
                           Navigator.pop(context, user);
                         }
 
@@ -242,15 +243,14 @@ class _MyMapState extends State<MyMap> {
       currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
         if (start) {
           points.add(currentLocation!);
-          timeIso.add(DateTime.now().toUtc().toIso8601String());
+          timeIso.add('${DateTime.now().toUtc().toIso8601String().substring(0, 19)}Z');
           _polyline.add(
               Polyline(
-                polylineId: PolylineId('A'),
+                polylineId: const PolylineId('A'),
                 points: points,
                 color: Colors.red,
               )
           );
-          // await routes.drawRoute(points, "RouteMap", Colors.red, "AIzaSyA3U7GWwoEJdgdIAoKU-CRejRmDR0z1Pac");
           dis = distance.calculateRouteDistance(points, decimals: 2);
         }
       if (_controller.isCompleted) await cameraPositionChange(currentLocation!);

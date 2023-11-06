@@ -108,28 +108,28 @@ class _MyAppState extends State<MyApp> {
           // print(response3.body);
           // upload activity by ChatGPT
 
-          Directory? downloadsDirectory = await DownloadsPath.downloadsDirectory();
           String? downloadsDirectoryPath = (await DownloadsPath.downloadsDirectory())?.path;
-          print(downloadsDirectoryPath);
-          var status = await Permission.storage.request();
-
+          if (!(await Permission.storage.status.isGranted)) {
+            var status = await Permission.storage.request();
+            print('Permission failed');
+          }
           final uploadUrl = Uri.parse('https://www.strava.com/api/v3/uploads');
           final request = http.MultipartRequest('POST', uploadUrl)
           ..headers['Authorization'] = 'Bearer $accessToken'
           ..files.add(
             await http.MultipartFile.fromPath(
                 'file',
-                '$downloadsDirectoryPath/track.gpx',
+                '$downloadsDirectoryPath/gpxFake.gpx',
                 contentType: MediaType('application', 'gpx+xml')
-            ))
-          ..fields.addAll({
-            'name' : 'My activity',
-            'description' : 'Can i run from home to my school ?',
-            'trainer' : 'no',
-            'commute' : 'no',
-            'data_type' : 'gpx',
-            'external_id' : '342341224',
-          });
+            ));
+          // ..fields.addAll({
+          //   'name' : 'My activity',
+          //   'description' : 'Can i run from home to my school ?',
+          //   'trainer' : 'no',
+          //   'commute' : 'no',
+          //   'data_type' : 'gpx',
+          //   'external_id' : '342341224',
+          // });
 
           final responseUpload = await request.send();
           if (responseUpload.statusCode == 201) {
@@ -138,7 +138,6 @@ class _MyAppState extends State<MyApp> {
             print('fail');
           }
           print('complete');
-          // assert(data is List<Map<dynamic, dynamic>>);
         },
         child : const Icon(Icons.auto_awesome)
       ),
