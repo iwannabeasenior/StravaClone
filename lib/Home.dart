@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -12,6 +14,14 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+
+  // create new file named "gpxFake.gpx" to save activity
+  if (! await File('/storage/emulated/0/Download/gpxFake.gpx').exists()) {
+    await Directory('/storage/emulated/0/Download').create(recursive: true);
+    File file = File('/storage/emulated/0/Download/gpxFake.gpx');
+    await file.writeAsString('Here your new file will save your activity');
+  }
+
   runApp(const MaterialApp(
     debugShowCheckedModeBanner: false,
     home : Home(),

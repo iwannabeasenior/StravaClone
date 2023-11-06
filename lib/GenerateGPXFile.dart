@@ -1,5 +1,6 @@
 
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:xml/xml.dart';
 import 'dart:io';
 
@@ -103,7 +104,9 @@ Future<void> createGPXFile(List<LatLng> points, List<String> timeISO) async {
     )
   ]);
 
-
+  if (!(await Permission.storage.status.isGranted)) {
+    await Permission.storage.request();
+  }
   final gpxString = gpx.toXmlString(pretty: true);
   final file = File('/storage/emulated/0/Download/gpxFake.gpx');
   file.writeAsStringSync(gpxString);

@@ -73,7 +73,6 @@ class _MyMapState extends State<MyMap> {
               mapType: _currentMapType,
               polylines: _polyline,
               compassEnabled: true,
-              // polylines: routes.routes
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -205,7 +204,6 @@ class _MyMapState extends State<MyMap> {
   }
 
   Future<void> cameraPositionChange(LatLng pos) async {
-
     controllerMap = await _controller.future;
     CameraPosition cameraPosition = CameraPosition(target: pos, zoom : 30);
     await controllerMap.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
@@ -253,7 +251,7 @@ class _MyMapState extends State<MyMap> {
           );
           dis = distance.calculateRouteDistance(points, decimals: 2);
         }
-      if (_controller.isCompleted) await cameraPositionChange(currentLocation!);
+       await cameraPositionChange(currentLocation!);
       setState(() {});
     });
   }

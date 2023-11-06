@@ -57,10 +57,10 @@ Future<void> APICall() async {
   contentType: MediaType('application', 'gpx+xml')
   ))
   ..fields.addAll({
-  'name' : 'My activity',
+  'name' : 'My activity-$external_id',
   'description' : 'Can i run from home to my school ?',
-  'trainer' : 'no',
-  'commute' : 'no',
+  'trainer' : '0',
+  'commute' : '0',
   'data_type' : 'gpx',
   'external_id' : '$external_id',
   });
