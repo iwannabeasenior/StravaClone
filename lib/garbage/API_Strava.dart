@@ -3,10 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
 import 'package:http/http.dart' as http;
-import 'package:lecle_downloads_path_provider/lecle_downloads_path_provider.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:strava_client/strava_client.dart';
-import 'package:http_parser/http_parser.dart';
 
 
 // https thay vì parse vì https có thể thêm body, rất cần cho phương thức get ( đỡ phải viết parse'... dài dòng')
@@ -52,7 +49,7 @@ class _MyAppState extends State<MyApp> {
             'client_id' : '115822',
             'redirect_uri' : 'stravaflutter://redirect',
             'approval_prompt' : 'force',
-            'scope' : ['activity:read_all', 'activity:write']
+            'scope' : 'activity:read_all'
           });
 
           final result = await FlutterWebAuth2.authenticate(url: url.toString(), callbackUrlScheme: 'stravaflutter');
@@ -70,24 +67,27 @@ class _MyAppState extends State<MyApp> {
           print('token is :$accessToken');
           // ok done , i have accesstoken and refreshtoken, hehe, continue
 
-          final url2 = Uri.https('www.strava.com', '/api/v3/athlete/activities');
+          final url2 = Uri.https('www.strava.com', '/api/v3/athlete/activities/');
           final response2 = await http.get(url2,
             headers: {
             HttpHeaders.authorizationHeader : 'Bearer $accessToken'
             }
           );
-          // final data = jsonDecode(response2.body) as List<dynamic>;
-          // data.forEach((element) {
-          //   print(element);
-          // });
+          if (response2.statusCode == 201 || response2.statusCode == 200) {
+            print('success');
+          } else {
+            print('failed');
+          }
+          final data = jsonDecode(response2.body) as List<dynamic>;
+          data.forEach((element) {
+            print(element);
+          });
 
 
           // final response2 = await http.get(Uri.parse('https://www.strava.com/api/v3/athlete/activities?access_token=$accessToken'),
           //               headers: {
           //                             HttpHeaders.authorizationHeader : 'Bearer $accessToken'
           //               });
-
-
 
 
           // final url3 = Uri.https('www.strava.com', '/api/v3/uploads');
@@ -106,22 +106,23 @@ class _MyAppState extends State<MyApp> {
           // });
           // print(response3.toString());
           // print(response3.body);
+
           // upload activity by ChatGPT
 
-          String? downloadsDirectoryPath = (await DownloadsPath.downloadsDirectory())?.path;
-          if (!(await Permission.storage.status.isGranted)) {
-            var status = await Permission.storage.request();
-            print('Permission failed');
-          }
-          final uploadUrl = Uri.parse('https://www.strava.com/api/v3/uploads');
-          final request = http.MultipartRequest('POST', uploadUrl)
-          ..headers['Authorization'] = 'Bearer $accessToken'
-          ..files.add(
-            await http.MultipartFile.fromPath(
-                'file',
-                '$downloadsDirectoryPath/gpxFake.gpx',
-                contentType: MediaType('application', 'gpx+xml')
-            ));
+          // String? downloadsDirectoryPath = (await DownloadsPath.downloadsDirectory())?.path;
+          // if (!(await Permission.storage.status.isGranted)) {
+          //   var status = await Permission.storage.request();
+          //   print('Permission failed');
+          // }
+          // final uploadUrl = Uri.parse('https://www.strava.com/api/v3/uploads');
+          // final request = http.MultipartRequest('POST', uploadUrl)
+          // ..headers['Authorization'] = 'Bearer $accessToken'
+          // ..files.add(
+          //   await http.MultipartFile.fromPath(
+          //       'file',
+          //       '$downloadsDirectoryPath/gpxFake.gpx',
+          //       contentType: MediaType('application', 'gpx+xml')
+          //   ))
           // ..fields.addAll({
           //   'name' : 'My activity',
           //   'description' : 'Can i run from home to my school ?',
@@ -130,14 +131,14 @@ class _MyAppState extends State<MyApp> {
           //   'data_type' : 'gpx',
           //   'external_id' : '342341224',
           // });
-
-          final responseUpload = await request.send();
-          if (responseUpload.statusCode == 201) {
-            print('success');
-          } else {
-            print('fail');
-          }
-          print('complete');
+          //
+          // final responseUpload = await request.send();
+          // if (responseUpload.statusCode == 201) {
+          //   print('success');
+          // } else {
+          //   print('fail');
+          // }
+          // print('complete');
         },
         child : const Icon(Icons.auto_awesome)
       ),

@@ -9,7 +9,6 @@ import 'package:stop_watch_timer/stop_watch_timer.dart';
 
 class MyMap extends StatefulWidget {
   const MyMap({super.key});
-
   @override
   State<MyMap> createState() => _MyMapState();
 }
@@ -21,6 +20,7 @@ class _MyMapState extends State<MyMap> {
   final timeClock = StopWatchTimer();
   String dis  = '0.00 km';
   bool start = false;
+  double zoom = 20;
   DistanceCalculator distance = DistanceCalculator();
   final List<LatLng> points = [];
   final List<String> timeIso = [];
@@ -54,7 +54,7 @@ class _MyMapState extends State<MyMap> {
           children: [
             GoogleMap(
               initialCameraPosition:  CameraPosition(
-                  zoom: 30,
+                  zoom: zoom,
                   target: currentLocation!),
               markers: { Marker(
                 position: currentLocation!,
@@ -73,6 +73,9 @@ class _MyMapState extends State<MyMap> {
               mapType: _currentMapType,
               polylines: _polyline,
               compassEnabled: true,
+              onCameraMove: (CameraPosition cameraPosition) {
+                zoom = cameraPosition.zoom;
+              },
             ),
             Align(
               alignment: Alignment.centerRight,
@@ -125,6 +128,7 @@ class _MyMapState extends State<MyMap> {
             builder: (context, snap) {
               final value = snap.data;
               final displayTime = (value != null) ? StopWatchTimer.getDisplayTime(value!) : '00:00:00';
+
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -186,7 +190,9 @@ class _MyMapState extends State<MyMap> {
                             path.add(GeoPoint(latlng.latitude, latlng.longitude));
                           }
                           final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime, 'path' : path, 'timeISO' : timeIso};
-                          await _db.collection('information').add(user);
+                          if (timeIso.length > 0) {
+                            await _db.collection('information').add(user);
+                          }
 
                           Navigator.pop(context, user);
                         }
@@ -205,7 +211,7 @@ class _MyMapState extends State<MyMap> {
 
   Future<void> cameraPositionChange(LatLng pos) async {
     controllerMap = await _controller.future;
-    CameraPosition cameraPosition = CameraPosition(target: pos, zoom : 30);
+    CameraPosition cameraPosition = CameraPosition(target: pos, zoom : zoom);
     await controllerMap.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
 
