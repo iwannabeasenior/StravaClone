@@ -6,6 +6,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+
 class MyMap extends StatefulWidget {
   const MyMap({super.key});
   @override
@@ -16,10 +17,12 @@ class _MyMapState extends State<MyMap> {
   bool granted = false;
   final Set<Polyline> _polyline = {};
   MapType _currentMapType = MapType.normal;
-  late GoogleMapController controllerMap ;
+  late GoogleMapController controllerMap;
   final timeClock = StopWatchTimer();
   String dis  = '0.00 km';
   bool start = false;
+  bool exchange = false;
+  bool stop = false;
   double zoom = 20;
   DistanceCalculator distance = DistanceCalculator();
   final List<LatLng> points = [];
@@ -49,6 +52,14 @@ class _MyMapState extends State<MyMap> {
   Widget build(BuildContext context) {
     return currentLocation == null ? const Scaffold(body : Center(child: Text('Waiting for creating map...', textAlign: TextAlign.center,))) :
       Scaffold(
+        appBar: AppBar(
+          title: Center(child : Text('Run')),
+          backgroundColor: Colors.deepOrange,
+          actions: [
+            IconButton(onPressed: () {},
+                icon: Icon(Icons.settings))
+          ],
+        ),
         body : Stack(
           children: [
             GoogleMap(
@@ -120,84 +131,349 @@ class _MyMapState extends State<MyMap> {
 
 
         bottomNavigationBar: BottomAppBar(
-          color: Colors.amber,
-          height: 200,
+          color: Colors.white,
+          height: 300,
             child : StreamBuilder(
             stream: timeClock.rawTime ,
             builder: (context, snap) {
               final value = snap.data;
-              final displayTime = (value != null) ? StopWatchTimer.getDisplayTime(value!) : '00:00:00';
+              final displayTime = (value != null) ? StopWatchTimer.getDisplayTime(value) : '00:00:00';
 
               return Center(
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
+                    // Row(
+                    //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    //   children: [
+                    //     Padding(
+                    //       padding: EdgeInsets.all(2),
+                    //       child: Container(
+                    //         color: Colors.lightGreenAccent,
+                    //         height: 20,
+                    //         child: Text(
+                    //             'Time : ${displayTime.substring(0, 8)}',
+                    //             style : const TextStyle(
+                    //                 fontWeight: FontWeight.bold,
+                    //                 fontSize: 15
+                    //             )
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Container(
+                    //       height: 20,
+                    //       color: Colors.lightGreenAccent,
+                    //       child: Text(
+                    //         'Distance : $dis',
+                    //         style: const TextStyle(
+                    //           fontWeight: FontWeight.bold,
+                    //           fontSize: 15,
+                    //         ),
+                    //       ),
+                    //     ),
+                    //     Container(
+                    //       color : Colors.lightGreenAccent,
+                    //       height: 20,
+                    //       child: Text(
+                    //           (value != null) ? 'Speed : ${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value!.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h' : 'Speed : 0.00 km/h',
+                    //           style: const TextStyle(
+                    //               fontSize: 15,
+                    //               fontWeight: FontWeight.bold
+                    //           )
+                    //       ),
+                    //     ),
+                    //   ],
+                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Padding(
-                          padding: EdgeInsets.all(2),
-                          child: Container(
-                            color: Colors.lightGreenAccent,
-                            height: 20,
-                            child: Text(
-                                'Time : $displayTime',
-                                style : const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    fontSize: 15
-                                )
-                            ),
+                        Center(
+                          child: Column(
+                            children: [
+                              Text('Distance (km)'),
+                              Text(dis.substring(0, dis.length-3),
+                                  style: TextStyle(
+                                      fontSize: 50,
+                                      fontWeight: FontWeight.bold)),
+                            ],
                           ),
                         ),
-                        Container(
-                          height: 20,
-                          color: Colors.lightGreenAccent,
-                          child: Text(
-                            'Distance : $dis',
-                            style: const TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 15,
-                            ),
+                        VerticalDivider(color : Colors.grey, ),
+                        Center(
+                          child: Column(
+                            children: [
+                              Text('Pace (km/h)'),
+                              Text((value != null) ? (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value!.toString())) / (1000 * 3600))).toStringAsFixed(2) : '0.00',
+                                  style: TextStyle(
+                                      fontSize: 50,
+                                      fontWeight: FontWeight.bold)),
+                            ],
                           ),
-                        ),
-                        Container(
-                          color : Colors.lightGreenAccent,
-                          height: 20,
-                          child: Text(
-                              (value != null) ? 'Speed : ${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value!.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h' : 'Speed : 0.00 km/h',
-                              style: const TextStyle(
-                                  fontSize: 15,
-                                  fontWeight: FontWeight.bold
-                              )
-                          ),
-                        ),
+                        )
                       ],
                     ),
-
+                    Divider(color : Colors.grey),
+                    Column(
+                      children: [
+                        Text('Time',),
+                        Text(displayTime.substring(0, 8),
+                          style: TextStyle(
+                              fontSize: 60,
+                              fontWeight: FontWeight.bold)),
+                      ],
+                    ),
+                    Divider(color : Colors.grey),
                     Center(
-                      child: ElevatedButton(onPressed: ()  async {
+                      child: !exchange ? ElevatedButton(onPressed: ()  async {
                         if (!start) {
                           timeClock.onStartTimer();
+                          // Navigator.push(context, MaterialPageRoute(
+                          //     builder: (context) {
+                          //       timeClock.onStartTimer();
+                          //       return StreamBuilder(stream: timeClock.rawTime,
+                          //           builder: (context, snap) {
+                          //             final displayTime1 = StopWatchTimer.getDisplayTime(snap.data!);
+                          //             return Scaffold(
+                          //                 body : Column(
+                          //                   children: [
+                          //                     Expanded(
+                          //                         flex : 1,
+                          //                         child: Container(
+                          //                           padding: EdgeInsets.all(2),
+                          //                           child: Center(
+                          //                             child:  Column(
+                          //                               children: [
+                          //                                 SizedBox(height: 20,),
+                          //                                 Text('Time : ',
+                          //                                   style: TextStyle(
+                          //                                       fontSize: 30
+                          //                                   ),),
+                          //                                 Text(displayTime1.substring(0, 8),
+                          //                                     style: TextStyle(
+                          //                                       fontSize: 90,
+                          //                                       fontWeight: FontWeight.bold,
+                          //                                     )
+                          //                                 ),
+                          //                               ],
+                          //                             ),
+                          //                           ),
+                          //                         )
+                          //                     ),
+                          //                     Divider(
+                          //                       color : Colors.black,
+                          //                     ),
+                          //                     Expanded(
+                          //                         flex : 1,
+                          //                         child: Container(
+                          //                           padding: EdgeInsets.all(2),
+                          //                           child:   Column(
+                          //                             children: [
+                          //                               SizedBox(height: 20),
+                          //                               Text('Time : ',
+                          //                                 style: TextStyle(
+                          //                                   fontSize: 30,
+                          //                                 ),),
+                          //                               Text(displayTime1.substring(0, 8),
+                          //                                   style: TextStyle(
+                          //                                     fontSize: 90,
+                          //                                     fontWeight: FontWeight.bold,
+                          //                                   )
+                          //                               ),
+                          //                             ],
+                          //                           ),
+                          //                         )
+                          //                     ),
+                          //                     Divider(
+                          //                       color : Colors.black,
+                          //                     ),
+                          //                     Expanded(
+                          //                         flex : 1,
+                          //                         child: Container(
+                          //                           padding: EdgeInsets.all(2),
+                          //                           child:   Column(
+                          //                             children: [
+                          //                               SizedBox(height : 20),
+                          //                               Text('Time : ',
+                          //                                   style: TextStyle(
+                          //                                       fontSize: 30
+                          //                                   )),
+                          //                               Text(displayTime1.substring(0, 8),
+                          //                                   style: TextStyle(
+                          //                                     fontSize: 90,
+                          //                                     fontWeight: FontWeight.bold,
+                          //                                   )
+                          //                               ),
+                          //                             ],
+                          //                           ),
+                          //                         )
+                          //                     ),
+                          //                     Divider(
+                          //                       color : Colors.black,
+                          //                     ),
+                          //                     Expanded(
+                          //                         flex: 1,
+                          //                         child: Row(
+                          //                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          //                           children: [
+                          //                             ElevatedButton(onPressed: () {
+                          //
+                          //                             },
+                          //                               child: Icon(Icons.map),
+                          //                               style: ElevatedButton.styleFrom(
+                          //                                 backgroundColor: Colors.deepOrange,
+                          //                                 shape: CircleBorder(),
+                          //                                 fixedSize: Size(70, 70),
+                          //                               ),
+                          //                             ),
+                          //                             ElevatedButton(onPressed: () {
+                          //                               if (timeClock.isRunning) {
+                          //                                 timeClock.onStopTimer();
+                          //                                 setState(() {
+                          //
+                          //                                 });
+                          //                               } else {
+                          //                                 timeClock.onStartTimer();
+                          //                                 setState(() {
+                          //
+                          //                                 });
+                          //                               }
+                          //                             },
+                          //                               child: timeClock.isRunning ? Icon(Icons.stop, size: 40) : Icon(Icons.play_arrow, size : 40),
+                          //                               style: ElevatedButton.styleFrom(
+                          //                                 fixedSize: Size(70, 70),
+                          //                                 shape: CircleBorder(),
+                          //                                 backgroundColor: Colors.deepOrange,
+                          //                               ),
+                          //                             ),
+                          //                             ElevatedButton(
+                          //                               onPressed: () {
+                          //
+                          //                               } ,
+                          //                               child: Icon(Icons.wifi),
+                          //                               style: ElevatedButton.styleFrom(
+                          //                                 fixedSize: Size(70, 70),
+                          //                                 shape: BeveledRectangleBorder(),
+                          //                               ),
+                          //                             ),
+                          //                             ElevatedButton(
+                          //                               onPressed: () {
+                          //                                 // Hiển thị trang trượt lên khi nút được nhấn
+                          //                                 showModalBottomSheet(
+                          //                                   isScrollControlled: true,
+                          //                                   context: context,
+                          //                                   builder: (BuildContext context) {
+                          //                                     return MyBottomSheetContent();
+                          //                                   },
+                          //                                 );
+                          //                               },
+                          //                               child: Text('Mở trang trượt lên'),
+                          //                             ),
+                          //                           ],
+                          //                         )
+                          //                     ),
+                          //                   ],
+                          //                 )
+                          //             );
+                          //           });
+                          //           })
+                          //     );
                           setState(() {
                             start = true;
+                            stop = true;
                           });
                         } else {
                           timeClock.onStopTimer();
-                          start = false;
-                          List<GeoPoint> path = [];
-                          for (LatLng latlng in points) {
-                            path.add(GeoPoint(latlng.latitude, latlng.longitude));
-                          }
-                          final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime, 'path' : path, 'timeISO' : timeIso};
-                          if (timeIso.isNotEmpty) {
-                            await _db.collection('information').add(user);
-                          }
+                          exchange = true;
+                          stop = false;
+                          setState(() {
 
-                          Navigator.pop(context, user);
+                          });
+                          // start = false;
+                          // List<GeoPoint> path = [];
+                          // for (LatLng latlng in points) {
+                          //   path.add(GeoPoint(latlng.latitude, latlng.longitude));
+                          // }
+                          // final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime.substring(0, 8), 'path' : path, 'timeISO' : timeIso};
+                          // if (timeIso.isNotEmpty) {
+                          //   await _db.collection('information').add(user);
+                          // }
+                          // Navigator.pop(context, user);
+
                         }
 
-                      }, child: Icon(start ? Icons.stop : Icons.not_started_outlined )),
-                    ),
+                      },
+                        style: ElevatedButton.styleFrom(
+                          shape: const CircleBorder(),
+                          fixedSize: Size(80, 80),
+                          backgroundColor: Colors.deepOrange,
+                          shadowColor: Colors.lightBlueAccent
+                        )
+                        , child: !start ? Text('START',
+                          style: TextStyle(
+                            fontSize: 13
+                          ),) :
+                              Icon(Icons.stop, size: 20,)
+                    )
+                          : Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(onPressed: () {
+                                  exchange = false;
+                                  timeClock.onStartTimer();
+                                  stop = true;
+                                },
+                                  child : Text('RESUME',
+                                    style: TextStyle(
+                                        fontSize: 12
+                                    ),),
+                                  style: ElevatedButton.styleFrom(
+                                      shape: const CircleBorder(),
+                                      fixedSize: Size(80, 80),
+                                      backgroundColor: Colors.deepOrange,
+                                      shadowColor: Colors.lightBlueAccent
+                                  ),),
+                                ElevatedButton(onPressed: () {
+                                  showDialog(context: context,
+                                      builder: (context) {
+                                          return AlertDialog(
+                                            title: Text('Do you wanna save this acitivity ?'),
+                                            actions: [
+                                              TextButton(onPressed: () async {
+                                                List<GeoPoint> path = [];
+                                                for (LatLng latlng in points) {
+                                                  path.add(GeoPoint(latlng.latitude, latlng.longitude));
+                                                }
+                                                final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime.substring(0, 8), 'path' : path, 'timeISO' : timeIso};
+                                                if (timeIso.isNotEmpty) {
+                                                  await _db.collection('information').add(user);
+                                                }
+                                                Navigator.pop(context);
+                                                Navigator.pop(context, user);
+                                              }, child: Text('Yes')),
+                                              TextButton(onPressed: () {
+                                                Navigator.pop(context);
+                                                List<String> list = [];
+                                                List<GeoPoint> path = [];
+                                                final user = <String, dynamic>{'distance' : 'unvalid', 'speed' : 'unvalid', 'path' : path, 'timeISO' : list};
+                                                Navigator.pop(context, user);
+                                              }, child: Text('No'))
+                                            ],
+                                          );
+                                      });
+                                },
+                                    child : Text('FINISH',
+                                      style: TextStyle(
+                                          fontSize: 14
+                                      ),),
+                                    style: ElevatedButton.styleFrom(
+                                        shape: const CircleBorder(),
+                                        fixedSize: Size(80, 80),
+                                        backgroundColor: Colors.deepOrange,
+                                        shadowColor: Colors.lightBlueAccent
+                                    )),
+                        ],
+                      )
+                      ,)
                   ],
                 ),
               );
@@ -248,7 +524,7 @@ class _MyMapState extends State<MyMap> {
 
     location.onLocationChanged.listen((LocationData locationData) async {
       currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
-        if (start) {
+        if (stop) {
           points.add(currentLocation!);
           timeIso.add('${DateTime.now().toUtc().toIso8601String().substring(0, 19)}Z');
           _polyline.add(

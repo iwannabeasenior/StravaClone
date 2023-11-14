@@ -16,7 +16,7 @@ void main() async {
   );
 
   // // create new file named "gpxFake.gpx" to save activity
-
+  //
   if (Platform.isAndroid && ! await File('/storage/emulated/0/Download/gpxFake.gpx').exists()) {
     await Directory('/storage/emulated/0/Download').create(recursive: true);
     File file = File('/storage/emulated/0/Download/gpxFake.gpx');
