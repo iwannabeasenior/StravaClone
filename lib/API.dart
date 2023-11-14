@@ -13,22 +13,20 @@ Future<void> APICall() async {
   int external_id = random.nextInt(1000000);
   final db = FirebaseFirestore.instance;
   late Map<String, dynamic> token;
-  final accessToken;
-  final refreshToken;
+  final String accessToken;
+  final String refreshToken;
   bool flag = false;
   await db.collection('token').get().then((snapshot) {
-    if (snapshot.docs.length > 0)  {
+    if (snapshot.docs.isNotEmpty)  {
       for (var doc in snapshot.docs) {
         token = doc.data();
       }
     } else {
       flag = true;
-      token = {'ini' : 'ini'};
+      token = {'init' : 'init'};
     }
 
   });
-  print(token);
-
   if (flag) {
     final url = Uri.https('strava.com', '/api/v3/oauth/authorize', {
       'response_type': 'code',
@@ -73,7 +71,9 @@ Future<void> APICall() async {
     // });
 
   } else {
+    print('update data');
     final refreshTokenOld = token['refresh_token'];
+    print('refreshToken : $refreshTokenOld');
     final url = Uri.https('www.strava.com', '/api/v3/oauth/token');
     final response = await http.post(url, body : {
       'client_id' : '115822',
@@ -81,16 +81,22 @@ Future<void> APICall() async {
       'grant_type' : 'refresh_token',
       'refresh_token' : refreshTokenOld,
     });
-    accessToken = jsonDecode(response.body)['refresh_token'] as String;
-    refreshToken = jsonDecode(response.body)['access_token'] as String;
+    accessToken = jsonDecode(response.body)['access_token'] as String;
+    refreshToken = jsonDecode(response.body)['refresh_token'] as String;
+    print('refreshTokenOld : $refreshTokenOld');
+    print('accessToken : $accessToken');
 
+
+    print('refreshToken : $refreshToken');
     await db.collection('token').get().then(
         (snapshot) {
           for (var doc in snapshot.docs) {
-            doc.reference.update({
-              'access_token' : accessToken,
-              'refresh_token' : refreshToken,
-            });
+            doc.reference.update(
+            {
+              'refresh_token' :  refreshToken,
+              'access_token' : accessToken
+            }
+            );
           }
         }
     );

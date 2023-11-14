@@ -21,13 +21,26 @@ void main() async {
     await Directory('/storage/emulated/0/Download').create(recursive: true);
     File file = File('/storage/emulated/0/Download/gpxFake.gpx');
     await file.writeAsString('Here your new file will save your activity');
+  } else {
   }
   if (!(await Permission.storage.status.isGranted)) {
     await Permission.storage.request();
   }
-  runApp(const MaterialApp(
+  runApp( MaterialApp(
+    theme :  ThemeData(
+      appBarTheme: const AppBarTheme(
+        backgroundColor: Colors.red
+      ),
+      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
+      textTheme : const TextTheme(
+        displayLarge: TextStyle(
+          fontSize: 30,
+          fontWeight: FontWeight.bold
+        )
+      )
+    ),
     debugShowCheckedModeBanner: false,
-    home : SafeArea(child: Home()),
+    home : const SafeArea(child: Home()),
   ));
 }
 class Home extends StatefulWidget {
@@ -39,7 +52,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   late List<Map<String, dynamic>> run = [];
   late Map<String, dynamic> token;
   final db = FirebaseFirestore.instance;
@@ -67,10 +79,10 @@ class _HomeState extends State<Home> {
 
                   );
                 }));
-          }, icon: Icon(Icons.settings)),
+          }, icon: const Icon(Icons.settings)),
           IconButton(onPressed: () {
 
-          }, icon: Icon(Icons.find_in_page)),
+          }, icon: const Icon(Icons.find_in_page)),
           IconButton(onPressed: () {
             Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
@@ -89,33 +101,47 @@ class _HomeState extends State<Home> {
                       body : CustomScrollView(
                           slivers: <Widget> [
                             SliverList (
-                              delegate: SliverChildBuilderDelegate((context, index) =>  SizedBox(
+                              delegate: SliverChildBuilderDelegate((context, index) =>  Container(
+                                color : index % 2 == 1 ? Colors.amberAccent : Colors.greenAccent,
                                 height: 50,
-                                child: GestureDetector(child : Text(
-                                  'You completed a new activity at ${run[index]['timeISO'][run[index]['timeISO'].length-1] as String}'),
+                                child: GestureDetector(child : Column(
+                                  children: [
+                                    Text(
+                                      'You completed a new activity at ${run[index]['timeISO'][run[index]['timeISO'].length-1] as String}',
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold
+                                    )),
+                                    const Text(
+                                      'Go dive into those stats!'
+                                    )
+                                  ],
+                                ),
                                   onTap : () {
                                     Navigator.push(context, MaterialPageRoute(
                                         builder: (context) {
                                           return SafeArea(
                                               child: Scaffold(
                                                 body : Center(
-                                                  child: Row(
+                                                  child: Column(
                                                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                     children: [
                                                       Text('Distance : ${run[index]['distance']}',
                                                           style: const TextStyle(
                                                             color: Colors.red,
                                                             fontWeight: FontWeight.bold,
+                                                            fontSize: 32
                                                           )),
                                                       Text('Speed : ${run[index]['speed']} km/h',
                                                           style : const TextStyle(
                                                               color: Colors.red,
-                                                              fontWeight: FontWeight.bold
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 32
                                                           )),
                                                       Text('Time : ${run[index]['time']}',
                                                           style : const TextStyle(
                                                               color: Colors.red,
-                                                              fontWeight: FontWeight.bold
+                                                              fontWeight: FontWeight.bold,
+                                                              fontSize: 32
                                                           )),
                                                     ],
                                                   ),
@@ -133,9 +159,9 @@ class _HomeState extends State<Home> {
                   );
                 }));
 
-          }, icon: Icon(Icons.add_alert_rounded)),
+          }, icon: const Icon(Icons.add_alert_rounded)),
         ],
-        backgroundColor: Colors.black12,
+        // backgroundColor: Colors.black12,
         title: const Center(
           child: Text('Your routes',style: TextStyle(
             color: Colors.greenAccent,
@@ -149,7 +175,7 @@ class _HomeState extends State<Home> {
         onPressed: () async {
           final user = await Navigator.push(context, MaterialPageRoute(
               builder: (context) {
-                return const MyMap();
+                return const SafeArea(child: MyMap());
               }));
 
           if (user['timeISO'].length > 0) {
@@ -254,11 +280,9 @@ class _HomeState extends State<Home> {
   void initState() {
     super.initState();
     fetch();
-
   }
 
   void fetch() {
-
     db.collection('information').get().then((event) {
       for (var doc in event.docs) {
         run.add(doc.data());

@@ -6,7 +6,6 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-
 class MyMap extends StatefulWidget {
   const MyMap({super.key});
   @override
@@ -14,6 +13,7 @@ class MyMap extends StatefulWidget {
 }
 
 class _MyMapState extends State<MyMap> {
+  bool granted = false;
   final Set<Polyline> _polyline = {};
   MapType _currentMapType = MapType.normal;
   late GoogleMapController controllerMap ;
@@ -26,7 +26,6 @@ class _MyMapState extends State<MyMap> {
   final List<String> timeIso = [];
   final List<String> times = [];
   LatLng? currentLocation;
-  MapsRoutes routes = MapsRoutes();
   final Completer<GoogleMapController> _controller = Completer<GoogleMapController>();
   final _db = FirebaseFirestore.instance;
   @override
@@ -49,7 +48,7 @@ class _MyMapState extends State<MyMap> {
   @override
   Widget build(BuildContext context) {
     return currentLocation == null ? const Scaffold(body : Center(child: Text('Waiting for creating map...', textAlign: TextAlign.center,))) :
-       Scaffold(
+      Scaffold(
         body : Stack(
           children: [
             GoogleMap(
@@ -190,7 +189,7 @@ class _MyMapState extends State<MyMap> {
                             path.add(GeoPoint(latlng.latitude, latlng.longitude));
                           }
                           final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime, 'path' : path, 'timeISO' : timeIso};
-                          if (timeIso.length > 0) {
+                          if (timeIso.isNotEmpty) {
                             await _db.collection('information').add(user);
                           }
 
@@ -210,7 +209,10 @@ class _MyMapState extends State<MyMap> {
   }
 
   Future<void> cameraPositionChange(LatLng pos) async {
-    controllerMap = await _controller.future;
+    if (!granted) {
+      controllerMap = await _controller.future;
+      granted = true;
+    }
     CameraPosition cameraPosition = CameraPosition(target: pos, zoom : zoom);
     await controllerMap.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
   }
@@ -234,6 +236,7 @@ class _MyMapState extends State<MyMap> {
         return ;
       }
     }
+
     locationData = await location.getLocation().then(
         (value) {
            currentLocation = LatLng(value.latitude!, value.longitude!);
