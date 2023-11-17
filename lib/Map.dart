@@ -461,7 +461,7 @@ class _MyMapState extends State<MyMap> {
                                 showDialog(context: context,
                                     builder: (context) {
                                       return AlertDialog(
-                                        title: Text('Do you wanna save this acitivity ?'),
+                                        title: const Text('Do you wanna save this acitivity ?'),
                                         actions: [
                                           TextButton(onPressed: () async {
                                             List<GeoPoint> path = [];
@@ -474,21 +474,30 @@ class _MyMapState extends State<MyMap> {
                                             }
                                             Navigator.pop(context);
                                             Navigator.pop(context, user);
-                                          }, child: Text('Yes')),
+                                          }, child: const Text('Yes')),
                                           TextButton(onPressed: () {
                                             Navigator.pop(context);
-                                            List<String> list = [];
-                                            List<GeoPoint> path = [];
+                                            List<String> list = ['unvalid'];
+                                            List<GeoPoint> path = [GeoPoint(0, 0)];
                                             final user = <String, dynamic>{'distance' : 'unvalid', 'speed' : 'unvalid', 'path' : path, 'timeISO' : list};
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                                const SnackBar(content: Text(
+                                                    'UnSaved',
+                                                    style: TextStyle(
+                                                      fontSize: 20,
+                                                      fontWeight: FontWeight.bold,
+                                                      color: Colors.red,
+                                                    ),
+                                                )));
                                             Navigator.pop(context, user);
-                                          }, child: Text('No'))
+                                          }, child: const Text('No'))
                                         ],
                                       );
                                     });
                               },
                                   style: ElevatedButton.styleFrom(
                                       shape: const CircleBorder(),
-                                      fixedSize: Size(80, 80),
+                                      fixedSize: const Size(80, 80),
                                       backgroundColor: Colors.deepOrange,
                                       shadowColor: Colors.lightBlueAccent
                                   ),
@@ -500,7 +509,7 @@ class _MyMapState extends State<MyMap> {
                           ),
                           ElevatedButton(
                               onPressed: () {},
-                              child: Icon(Icons.map))
+                              child: const Icon(Icons.map))
                         ],
                       )
                     )

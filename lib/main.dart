@@ -65,10 +65,10 @@ class _HomeState extends State<Home> {
               Navigator.push(context,
                   MaterialPageRoute(
                     builder: (context) {
-                      return ProfileMain();
+                      return const ProfileMain();
                     }));
             },
-            icon: Icon(Icons.supervised_user_circle),
+            icon: const Icon(Icons.supervised_user_circle),
           ),
           IconButton(onPressed: () {
             Navigator.push(context, MaterialPageRoute(
@@ -207,10 +207,11 @@ class _HomeState extends State<Home> {
             showDialog(context: context,
                 builder: (context) {
                   return const AlertDialog(
+                    backgroundColor: Colors.lightBlue,
                     title: Text('Your activity is unvalid',
                     style: TextStyle(
                       fontWeight: FontWeight.bold,
-                      color: Colors.deepOrange
+                      color: Colors.black
                     )),
                   );
                 });
@@ -239,7 +240,7 @@ class _HomeState extends State<Home> {
 
                                   return GoogleMap(
                                       initialCameraPosition: CameraPosition(
-                                          target: list.isEmpty ? LatLng(0,0) : LatLng(list[0].latitude, list[0].longitude),
+                                          target: list.isEmpty ? const LatLng(0,0) : LatLng(list[0].latitude, list[0].longitude),
                                           zoom: 18
                                       ),
                                       polylines: {
