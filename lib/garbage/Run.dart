@@ -7,7 +7,7 @@ import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 
-import 'garbage/slidefrombottom.dart';
+import 'slidefrombottom.dart';
 void main() {
   runApp(MaterialApp(
     home : SafeArea(

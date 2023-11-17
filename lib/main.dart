@@ -1,13 +1,12 @@
-import 'dart:io';
-import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:stravaclone/API.dart';
+import 'package:stravaclone/StravaAPI.dart';
+import 'package:stravaclone/PersionalProfile.dart';
 import 'GenerateGPXFile.dart';
-import 'firebase_options.dart';
 import 'Map.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -17,15 +16,15 @@ void main() async {
 
   // // create new file named "gpxFake.gpx" to save activity
   //
-  if (Platform.isAndroid && ! await File('/storage/emulated/0/Download/gpxFake.gpx').exists()) {
-    await Directory('/storage/emulated/0/Download').create(recursive: true);
-    File file = File('/storage/emulated/0/Download/gpxFake.gpx');
-    await file.writeAsString('Here your new file will save your activity');
-  } else {
-  }
-  if (!(await Permission.storage.status.isGranted)) {
-    await Permission.storage.request();
-  }
+  // if (Platform.isAndroid && ! await File('/storage/emulated/0/Download/gpxFake.gpx').exists()) {
+  //   await Directory('/storage/emulated/0/Download').create(recursive: true);
+  //   File file = File('/storage/emulated/0/Download/gpxFake.gpx');
+  //   await file.writeAsString('Here your new file will save your activity');
+  // } else {
+  // }
+  // if (!(await Permission.storage.status.isGranted)) {
+  //   await Permission.storage.request();
+  // }
   runApp( MaterialApp(
     theme :  ThemeData(
       appBarTheme: const AppBarTheme(
@@ -61,6 +60,16 @@ class _HomeState extends State<Home> {
     return Scaffold(
       appBar: AppBar(
         actions: [
+          IconButton(
+            onPressed: () {
+              Navigator.push(context,
+                  MaterialPageRoute(
+                    builder: (context) {
+                      return ProfileMain();
+                    }));
+            },
+            icon: Icon(Icons.supervised_user_circle),
+          ),
           IconButton(onPressed: () {
             Navigator.push(context, MaterialPageRoute(
                 builder: (context) {
@@ -103,9 +112,10 @@ class _HomeState extends State<Home> {
                             SliverList (
                               delegate: SliverChildBuilderDelegate((context, index) =>  Container(
                                 color : index % 2 == 1 ? Colors.amberAccent : Colors.greenAccent,
-                                height: 50,
+                                height: 80,
                                 child: GestureDetector(child : Column(
                                   children: [
+                                    const Icon(Icons.snowshoeing),
                                     Text(
                                       'You completed a new activity at ${run[index]['timeISO'][run[index]['timeISO'].length-1] as String}',
                                     style: const TextStyle(
@@ -173,11 +183,16 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
         onPressed: () async {
-          final user = await Navigator.push(context, MaterialPageRoute(
+          // final user = await Navigator.push(context, MaterialPageRoute(
+          //     builder: (context) {
+          //       return const SafeArea(child: MyMap());
+          //     }));
+          final user = await showModalBottomSheet(
+              isScrollControlled: true,
+              context: context,
               builder: (context) {
                 return const SafeArea(child: MyMap());
-              }));
-
+              });
           if (user['timeISO'].length > 0) {
             List<LatLng> list = [];
             for (var coordinate in user['path']) {

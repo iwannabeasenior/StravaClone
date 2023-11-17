@@ -51,6 +51,13 @@ android {
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
+        manifestPlaceholders = [
+                appAuthRedirectScheme: 'stravaflutter',
+                redirectHostName     : 'redirect',
+                applicationName      : "io.flutter.plugins.App1",
+                redirectSchemeName: 'stravaflutter'
+        ]
+
     }
 
     buildTypes {
@@ -67,5 +74,7 @@ flutter {
 }
 
 dependencies {
+    implementation project(':spotify-app-remote')
+    implementation "com.google.code.gson:gson:2.10.1"
 }
 apply plugin : "com.google.gms.google-services"

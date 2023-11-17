@@ -6,6 +6,9 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+import 'package:stravaclone/SpotifyApi.dart';
+
+import 'font/my_flutter_app_icons.dart';
 
 class MyMap extends StatefulWidget {
   const MyMap({super.key});
@@ -51,9 +54,9 @@ class _MyMapState extends State<MyMap> {
   @override
   Widget build(BuildContext context) {
     return currentLocation == null ? const Scaffold(body : Center(child: Text('Waiting for creating map...', textAlign: TextAlign.center,))) :
-      Scaffold(
+      SafeArea(child: Scaffold(
         appBar: AppBar(
-          title: Center(child : Text('Run')),
+          title: const Center(child : Text('Run')),
           backgroundColor: Colors.deepOrange,
           actions: [
             IconButton(onPressed: () {},
@@ -190,21 +193,21 @@ class _MyMapState extends State<MyMap> {
                         Center(
                           child: Column(
                             children: [
-                              Text('Distance (km)'),
+                              const Text('Distance (km)'),
                               Text(dis.substring(0, dis.length-3),
-                                  style: TextStyle(
+                                  style: const TextStyle(
                                       fontSize: 50,
                                       fontWeight: FontWeight.bold)),
                             ],
                           ),
                         ),
-                        VerticalDivider(color : Colors.grey, ),
+                        const VerticalDivider(color : Colors.grey, ),
                         Center(
                           child: Column(
                             children: [
-                              Text('Pace (km/h)'),
-                              Text((value != null) ? (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value!.toString())) / (1000 * 3600))).toStringAsFixed(2) : '0.00',
-                                  style: TextStyle(
+                              const Text('Pace (km/h)'),
+                              Text((value != null) ? (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) : '0.00',
+                                  style: const TextStyle(
                                       fontSize: 50,
                                       fontWeight: FontWeight.bold)),
                             ],
@@ -212,275 +215,302 @@ class _MyMapState extends State<MyMap> {
                         )
                       ],
                     ),
-                    Divider(color : Colors.grey),
+                    const Divider(color : Colors.grey),
                     Column(
                       children: [
-                        Text('Time',),
+                        const Text('Time',),
                         Text(displayTime.substring(0, 8),
-                          style: TextStyle(
+                          style: const TextStyle(
                               fontSize: 60,
                               fontWeight: FontWeight.bold)),
                       ],
                     ),
-                    Divider(color : Colors.grey),
+                    const Divider(color : Colors.grey),
                     Center(
-                      child: !exchange ? ElevatedButton(onPressed: ()  async {
-                        if (!start) {
-                          timeClock.onStartTimer();
-                          // Navigator.push(context, MaterialPageRoute(
-                          //     builder: (context) {
-                          //       timeClock.onStartTimer();
-                          //       return StreamBuilder(stream: timeClock.rawTime,
-                          //           builder: (context, snap) {
-                          //             final displayTime1 = StopWatchTimer.getDisplayTime(snap.data!);
-                          //             return Scaffold(
-                          //                 body : Column(
-                          //                   children: [
-                          //                     Expanded(
-                          //                         flex : 1,
-                          //                         child: Container(
-                          //                           padding: EdgeInsets.all(2),
-                          //                           child: Center(
-                          //                             child:  Column(
-                          //                               children: [
-                          //                                 SizedBox(height: 20,),
-                          //                                 Text('Time : ',
-                          //                                   style: TextStyle(
-                          //                                       fontSize: 30
-                          //                                   ),),
-                          //                                 Text(displayTime1.substring(0, 8),
-                          //                                     style: TextStyle(
-                          //                                       fontSize: 90,
-                          //                                       fontWeight: FontWeight.bold,
-                          //                                     )
-                          //                                 ),
-                          //                               ],
-                          //                             ),
-                          //                           ),
-                          //                         )
-                          //                     ),
-                          //                     Divider(
-                          //                       color : Colors.black,
-                          //                     ),
-                          //                     Expanded(
-                          //                         flex : 1,
-                          //                         child: Container(
-                          //                           padding: EdgeInsets.all(2),
-                          //                           child:   Column(
-                          //                             children: [
-                          //                               SizedBox(height: 20),
-                          //                               Text('Time : ',
-                          //                                 style: TextStyle(
-                          //                                   fontSize: 30,
-                          //                                 ),),
-                          //                               Text(displayTime1.substring(0, 8),
-                          //                                   style: TextStyle(
-                          //                                     fontSize: 90,
-                          //                                     fontWeight: FontWeight.bold,
-                          //                                   )
-                          //                               ),
-                          //                             ],
-                          //                           ),
-                          //                         )
-                          //                     ),
-                          //                     Divider(
-                          //                       color : Colors.black,
-                          //                     ),
-                          //                     Expanded(
-                          //                         flex : 1,
-                          //                         child: Container(
-                          //                           padding: EdgeInsets.all(2),
-                          //                           child:   Column(
-                          //                             children: [
-                          //                               SizedBox(height : 20),
-                          //                               Text('Time : ',
-                          //                                   style: TextStyle(
-                          //                                       fontSize: 30
-                          //                                   )),
-                          //                               Text(displayTime1.substring(0, 8),
-                          //                                   style: TextStyle(
-                          //                                     fontSize: 90,
-                          //                                     fontWeight: FontWeight.bold,
-                          //                                   )
-                          //                               ),
-                          //                             ],
-                          //                           ),
-                          //                         )
-                          //                     ),
-                          //                     Divider(
-                          //                       color : Colors.black,
-                          //                     ),
-                          //                     Expanded(
-                          //                         flex: 1,
-                          //                         child: Row(
-                          //                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          //                           children: [
-                          //                             ElevatedButton(onPressed: () {
-                          //
-                          //                             },
-                          //                               child: Icon(Icons.map),
-                          //                               style: ElevatedButton.styleFrom(
-                          //                                 backgroundColor: Colors.deepOrange,
-                          //                                 shape: CircleBorder(),
-                          //                                 fixedSize: Size(70, 70),
-                          //                               ),
-                          //                             ),
-                          //                             ElevatedButton(onPressed: () {
-                          //                               if (timeClock.isRunning) {
-                          //                                 timeClock.onStopTimer();
-                          //                                 setState(() {
-                          //
-                          //                                 });
-                          //                               } else {
-                          //                                 timeClock.onStartTimer();
-                          //                                 setState(() {
-                          //
-                          //                                 });
-                          //                               }
-                          //                             },
-                          //                               child: timeClock.isRunning ? Icon(Icons.stop, size: 40) : Icon(Icons.play_arrow, size : 40),
-                          //                               style: ElevatedButton.styleFrom(
-                          //                                 fixedSize: Size(70, 70),
-                          //                                 shape: CircleBorder(),
-                          //                                 backgroundColor: Colors.deepOrange,
-                          //                               ),
-                          //                             ),
-                          //                             ElevatedButton(
-                          //                               onPressed: () {
-                          //
-                          //                               } ,
-                          //                               child: Icon(Icons.wifi),
-                          //                               style: ElevatedButton.styleFrom(
-                          //                                 fixedSize: Size(70, 70),
-                          //                                 shape: BeveledRectangleBorder(),
-                          //                               ),
-                          //                             ),
-                          //                             ElevatedButton(
-                          //                               onPressed: () {
-                          //                                 // Hiển thị trang trượt lên khi nút được nhấn
-                          //                                 showModalBottomSheet(
-                          //                                   isScrollControlled: true,
-                          //                                   context: context,
-                          //                                   builder: (BuildContext context) {
-                          //                                     return MyBottomSheetContent();
-                          //                                   },
-                          //                                 );
-                          //                               },
-                          //                               child: Text('Mở trang trượt lên'),
-                          //                             ),
-                          //                           ],
-                          //                         )
-                          //                     ),
-                          //                   ],
-                          //                 )
-                          //             );
-                          //           });
-                          //           })
-                          //     );
-                          setState(() {
-                            start = true;
-                            stop = true;
-                          });
-                        } else {
-                          timeClock.onStopTimer();
-                          exchange = true;
-                          stop = false;
-                          setState(() {
+                      child : Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          ElevatedButton(
+                              onPressed: () {
+                                showModalBottomSheet(
+                                    elevation: 3,
+                                    context: context,
+                                    builder: (context) {
+                                      return  const SizedBox(
+                                          height: 300,
+                                          child: SpotifyAPI());
+                                    });
+                              },
+                              child: Icon(Spotify.spotify, size: 40),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                fixedSize: Size(60, 60),
+                                shape: CircleBorder()
+                              ),
+                          ),
 
-                          });
-                          // start = false;
-                          // List<GeoPoint> path = [];
-                          // for (LatLng latlng in points) {
-                          //   path.add(GeoPoint(latlng.latitude, latlng.longitude));
-                          // }
-                          // final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime.substring(0, 8), 'path' : path, 'timeISO' : timeIso};
-                          // if (timeIso.isNotEmpty) {
-                          //   await _db.collection('information').add(user);
-                          // }
-                          // Navigator.pop(context, user);
+                          !exchange ? ElevatedButton(onPressed: ()  async {
+                            if (!start) {
+                              timeClock.onStartTimer();
+                              // Navigator.push(context, MaterialPageRoute(
+                              //     builder: (context) {
+                              //       timeClock.onStartTimer();
+                              //       return StreamBuilder(stream: timeClock.rawTime,
+                              //           builder: (context, snap) {
+                              //             final displayTime1 = StopWatchTimer.getDisplayTime(snap.data!);
+                              //             return Scaffold(
+                              //                 body : Column(
+                              //                   children: [
+                              //                     Expanded(
+                              //                         flex : 1,
+                              //                         child: Container(
+                              //                           padding: EdgeInsets.all(2),
+                              //                           child: Center(
+                              //                             child:  Column(
+                              //                               children: [
+                              //                                 SizedBox(height: 20,),
+                              //                                 Text('Time : ',
+                              //                                   style: TextStyle(
+                              //                                       fontSize: 30
+                              //                                   ),),
+                              //                                 Text(displayTime1.substring(0, 8),
+                              //                                     style: TextStyle(
+                              //                                       fontSize: 90,
+                              //                                       fontWeight: FontWeight.bold,
+                              //                                     )
+                              //                                 ),
+                              //                               ],
+                              //                             ),
+                              //                           ),
+                              //                         )
+                              //                     ),
+                              //                     Divider(
+                              //                       color : Colors.black,
+                              //                     ),
+                              //                     Expanded(
+                              //                         flex : 1,
+                              //                         child: Container(
+                              //                           padding: EdgeInsets.all(2),
+                              //                           child:   Column(
+                              //                             children: [
+                              //                               SizedBox(height: 20),
+                              //                               Text('Time : ',
+                              //                                 style: TextStyle(
+                              //                                   fontSize: 30,
+                              //                                 ),),
+                              //                               Text(displayTime1.substring(0, 8),
+                              //                                   style: TextStyle(
+                              //                                     fontSize: 90,
+                              //                                     fontWeight: FontWeight.bold,
+                              //                                   )
+                              //                               ),
+                              //                             ],
+                              //                           ),
+                              //                         )
+                              //                     ),
+                              //                     Divider(
+                              //                       color : Colors.black,
+                              //                     ),
+                              //                     Expanded(
+                              //                         flex : 1,
+                              //                         child: Container(
+                              //                           padding: EdgeInsets.all(2),
+                              //                           child:   Column(
+                              //                             children: [
+                              //                               SizedBox(height : 20),
+                              //                               Text('Time : ',
+                              //                                   style: TextStyle(
+                              //                                       fontSize: 30
+                              //                                   )),
+                              //                               Text(displayTime1.substring(0, 8),
+                              //                                   style: TextStyle(
+                              //                                     fontSize: 90,
+                              //                                     fontWeight: FontWeight.bold,
+                              //                                   )
+                              //                               ),
+                              //                             ],
+                              //                           ),
+                              //                         )
+                              //                     ),
+                              //                     Divider(
+                              //                       color : Colors.black,
+                              //                     ),
+                              //                     Expanded(
+                              //                         flex: 1,
+                              //                         child: Row(
+                              //                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              //                           children: [
+                              //                             ElevatedButton(onPressed: () {
+                              //
+                              //                             },
+                              //                               child: Icon(Icons.map),
+                              //                               style: ElevatedButton.styleFrom(
+                              //                                 backgroundColor: Colors.deepOrange,
+                              //                                 shape: CircleBorder(),
+                              //                                 fixedSize: Size(70, 70),
+                              //                               ),
+                              //                             ),
+                              //                             ElevatedButton(onPressed: () {
+                              //                               if (timeClock.isRunning) {
+                              //                                 timeClock.onStopTimer();
+                              //                                 setState(() {
+                              //
+                              //                                 });
+                              //                               } else {
+                              //                                 timeClock.onStartTimer();
+                              //                                 setState(() {
+                              //
+                              //                                 });
+                              //                               }
+                              //                             },
+                              //                               child: timeClock.isRunning ? Icon(Icons.stop, size: 40) : Icon(Icons.play_arrow, size : 40),
+                              //                               style: ElevatedButton.styleFrom(
+                              //                                 fixedSize: Size(70, 70),
+                              //                                 shape: CircleBorder(),
+                              //                                 backgroundColor: Colors.deepOrange,
+                              //                               ),
+                              //                             ),
+                              //                             ElevatedButton(
+                              //                               onPressed: () {
+                              //
+                              //                               } ,
+                              //                               child: Icon(Icons.wifi),
+                              //                               style: ElevatedButton.styleFrom(
+                              //                                 fixedSize: Size(70, 70),
+                              //                                 shape: BeveledRectangleBorder(),
+                              //                               ),
+                              //                             ),
+                              //                             ElevatedButton(
+                              //                               onPressed: () {
+                              //                                 // Hiển thị trang trượt lên khi nút được nhấn
+                              //                                 showModalBottomSheet(
+                              //                                   isScrollControlled: true,
+                              //                                   context: context,
+                              //                                   builder: (BuildContext context) {
+                              //                                     return MyBottomSheetContent();
+                              //                                   },
+                              //                                 );
+                              //                               },
+                              //                               child: Text('Mở trang trượt lên'),
+                              //                             ),
+                              //                           ],
+                              //                         )
+                              //                     ),
+                              //                   ],
+                              //                 )
+                              //             );
+                              //           });
+                              //           })
+                              //     );
+                              setState(() {
+                                start = true;
+                                stop = true;
+                              });
+                            } else {
+                              timeClock.onStopTimer();
+                              exchange = true;
+                              stop = false;
+                              setState(() {
 
-                        }
+                              });
+                              // start = false;
+                              // List<GeoPoint> path = [];
+                              // for (LatLng latlng in points) {
+                              //   path.add(GeoPoint(latlng.latitude, latlng.longitude));
+                              // }
+                              // final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime.substring(0, 8), 'path' : path, 'timeISO' : timeIso};
+                              // if (timeIso.isNotEmpty) {
+                              //   await _db.collection('information').add(user);
+                              // }
+                              // Navigator.pop(context, user);
 
-                      },
-                        style: ElevatedButton.styleFrom(
-                          shape: const CircleBorder(),
-                          fixedSize: Size(80, 80),
-                          backgroundColor: Colors.deepOrange,
-                          shadowColor: Colors.lightBlueAccent
-                        )
-                        , child: !start ? Text('START',
-                          style: TextStyle(
-                            fontSize: 13
-                          ),) :
-                              Icon(Icons.stop, size: 20,)
-                    )
-                          : Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                ElevatedButton(onPressed: () {
-                                  exchange = false;
-                                  timeClock.onStartTimer();
-                                  stop = true;
-                                },
-                                  child : Text('RESUME',
-                                    style: TextStyle(
-                                        fontSize: 12
-                                    ),),
+                            }
+
+                          },
+                              style: ElevatedButton.styleFrom(
+                                  shape: const CircleBorder(),
+                                  fixedSize: Size(80, 80),
+                                  backgroundColor: Colors.deepOrange,
+                                  shadowColor: Colors.lightBlueAccent
+                              )
+                              , child: !start ? const Text('START',
+                                style: TextStyle(
+                                    fontSize: 13
+                                ),) :
+                              const Icon(Icons.stop, size: 20,)
+                          )
+                              : Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              ElevatedButton(onPressed: () {
+                                exchange = false;
+                                timeClock.onStartTimer();
+                                stop = true;
+                              },
+                                style: ElevatedButton.styleFrom(
+                                    shape: const CircleBorder(),
+                                    fixedSize: Size(80, 80),
+                                    backgroundColor: Colors.deepOrange,
+                                    shadowColor: Colors.lightBlueAccent
+                                ),
+                                child : const Text('RESUME',
+                                  style: TextStyle(
+                                      fontSize: 12
+                                  ),),),
+                              ElevatedButton(onPressed: () {
+                                showDialog(context: context,
+                                    builder: (context) {
+                                      return AlertDialog(
+                                        title: Text('Do you wanna save this acitivity ?'),
+                                        actions: [
+                                          TextButton(onPressed: () async {
+                                            List<GeoPoint> path = [];
+                                            for (LatLng latlng in points) {
+                                              path.add(GeoPoint(latlng.latitude, latlng.longitude));
+                                            }
+                                            final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime.substring(0, 8), 'path' : path, 'timeISO' : timeIso};
+                                            if (timeIso.isNotEmpty) {
+                                              await _db.collection('information').add(user);
+                                            }
+                                            Navigator.pop(context);
+                                            Navigator.pop(context, user);
+                                          }, child: Text('Yes')),
+                                          TextButton(onPressed: () {
+                                            Navigator.pop(context);
+                                            List<String> list = [];
+                                            List<GeoPoint> path = [];
+                                            final user = <String, dynamic>{'distance' : 'unvalid', 'speed' : 'unvalid', 'path' : path, 'timeISO' : list};
+                                            Navigator.pop(context, user);
+                                          }, child: Text('No'))
+                                        ],
+                                      );
+                                    });
+                              },
                                   style: ElevatedButton.styleFrom(
                                       shape: const CircleBorder(),
                                       fixedSize: Size(80, 80),
                                       backgroundColor: Colors.deepOrange,
                                       shadowColor: Colors.lightBlueAccent
-                                  ),),
-                                ElevatedButton(onPressed: () {
-                                  showDialog(context: context,
-                                      builder: (context) {
-                                          return AlertDialog(
-                                            title: Text('Do you wanna save this acitivity ?'),
-                                            actions: [
-                                              TextButton(onPressed: () async {
-                                                List<GeoPoint> path = [];
-                                                for (LatLng latlng in points) {
-                                                  path.add(GeoPoint(latlng.latitude, latlng.longitude));
-                                                }
-                                                final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime.substring(0, 8), 'path' : path, 'timeISO' : timeIso};
-                                                if (timeIso.isNotEmpty) {
-                                                  await _db.collection('information').add(user);
-                                                }
-                                                Navigator.pop(context);
-                                                Navigator.pop(context, user);
-                                              }, child: Text('Yes')),
-                                              TextButton(onPressed: () {
-                                                Navigator.pop(context);
-                                                List<String> list = [];
-                                                List<GeoPoint> path = [];
-                                                final user = <String, dynamic>{'distance' : 'unvalid', 'speed' : 'unvalid', 'path' : path, 'timeISO' : list};
-                                                Navigator.pop(context, user);
-                                              }, child: Text('No'))
-                                            ],
-                                          );
-                                      });
-                                },
-                                    child : Text('FINISH',
-                                      style: TextStyle(
-                                          fontSize: 14
-                                      ),),
-                                    style: ElevatedButton.styleFrom(
-                                        shape: const CircleBorder(),
-                                        fixedSize: Size(80, 80),
-                                        backgroundColor: Colors.deepOrange,
-                                        shadowColor: Colors.lightBlueAccent
-                                    )),
+                                  ),
+                                  child : const Text('FINISH',
+                                    style: TextStyle(
+                                        fontSize: 14
+                                    ),)),
+                            ],
+                          ),
+                          ElevatedButton(
+                              onPressed: () {},
+                              child: Icon(Icons.map))
                         ],
                       )
-                      ,)
+                    )
                   ],
                 ),
               );
             },
           )
           )
-        );
+        ));
     
   }
 

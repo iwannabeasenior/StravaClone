@@ -55,6 +55,10 @@ dependencies:
   http_parser: ^4.0.2
   app_settings: ^5.1.1
   settings_ui: ^2.0.2
+  fl_chart: ^0.64.0
+  spotify_sdk: ^3.0.0-dev.2
+  flutter_dotenv: ^5.1.0
+  logger: ^2.0.2+1
 
 dev_dependencies:
   flutter_test:
@@ -79,6 +83,15 @@ flutter:
   uses-material-design: true
   assets:
     - asset/image/map.png
+    - asset/image/profile.png
+    - .env
+  fonts:
+    - family: Spotify
+      fonts:
+        - asset: asset/font/Spotify.ttf
+    - family: Heart
+      fonts:
+        - asset: asset/font/Heart.ttf
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
