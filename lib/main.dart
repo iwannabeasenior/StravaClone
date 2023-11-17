@@ -1,3 +1,5 @@
+import 'dart:io';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -16,15 +18,15 @@ void main() async {
 
   // // create new file named "gpxFake.gpx" to save activity
   //
-  // if (Platform.isAndroid && ! await File('/storage/emulated/0/Download/gpxFake.gpx').exists()) {
-  //   await Directory('/storage/emulated/0/Download').create(recursive: true);
-  //   File file = File('/storage/emulated/0/Download/gpxFake.gpx');
-  //   await file.writeAsString('Here your new file will save your activity');
-  // } else {
-  // }
-  // if (!(await Permission.storage.status.isGranted)) {
-  //   await Permission.storage.request();
-  // }
+  if (Platform.isAndroid && ! await File('/storage/emulated/0/Download/gpxFake.gpx').exists()) {
+    await Directory('/storage/emulated/0/Download').create(recursive: true);
+    File file = File('/storage/emulated/0/Download/gpxFake.gpx');
+    await file.writeAsString('Here your new file will save your activity');
+  } else {
+  }
+  if (!(await Permission.storage.status.isGranted)) {
+    await Permission.storage.request();
+  }
   runApp( MaterialApp(
     theme :  ThemeData(
       appBarTheme: const AppBarTheme(

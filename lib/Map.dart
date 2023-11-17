@@ -7,7 +7,6 @@ import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:stravaclone/SpotifyApi.dart';
-
 import 'font/my_flutter_app_icons.dart';
 
 class MyMap extends StatefulWidget {
@@ -146,47 +145,6 @@ class _MyMapState extends State<MyMap> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    // Row(
-                    //   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    //   children: [
-                    //     Padding(
-                    //       padding: EdgeInsets.all(2),
-                    //       child: Container(
-                    //         color: Colors.lightGreenAccent,
-                    //         height: 20,
-                    //         child: Text(
-                    //             'Time : ${displayTime.substring(0, 8)}',
-                    //             style : const TextStyle(
-                    //                 fontWeight: FontWeight.bold,
-                    //                 fontSize: 15
-                    //             )
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     Container(
-                    //       height: 20,
-                    //       color: Colors.lightGreenAccent,
-                    //       child: Text(
-                    //         'Distance : $dis',
-                    //         style: const TextStyle(
-                    //           fontWeight: FontWeight.bold,
-                    //           fontSize: 15,
-                    //         ),
-                    //       ),
-                    //     ),
-                    //     Container(
-                    //       color : Colors.lightGreenAccent,
-                    //       height: 20,
-                    //       child: Text(
-                    //           (value != null) ? 'Speed : ${(double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value!.toString())) / (1000 * 3600))).toStringAsFixed(2)} km/h' : 'Speed : 0.00 km/h',
-                    //           style: const TextStyle(
-                    //               fontSize: 15,
-                    //               fontWeight: FontWeight.bold
-                    //           )
-                    //       ),
-                    //     ),
-                    //   ],
-                    // ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
@@ -252,156 +210,6 @@ class _MyMapState extends State<MyMap> {
                           !exchange ? ElevatedButton(onPressed: ()  async {
                             if (!start) {
                               timeClock.onStartTimer();
-                              // Navigator.push(context, MaterialPageRoute(
-                              //     builder: (context) {
-                              //       timeClock.onStartTimer();
-                              //       return StreamBuilder(stream: timeClock.rawTime,
-                              //           builder: (context, snap) {
-                              //             final displayTime1 = StopWatchTimer.getDisplayTime(snap.data!);
-                              //             return Scaffold(
-                              //                 body : Column(
-                              //                   children: [
-                              //                     Expanded(
-                              //                         flex : 1,
-                              //                         child: Container(
-                              //                           padding: EdgeInsets.all(2),
-                              //                           child: Center(
-                              //                             child:  Column(
-                              //                               children: [
-                              //                                 SizedBox(height: 20,),
-                              //                                 Text('Time : ',
-                              //                                   style: TextStyle(
-                              //                                       fontSize: 30
-                              //                                   ),),
-                              //                                 Text(displayTime1.substring(0, 8),
-                              //                                     style: TextStyle(
-                              //                                       fontSize: 90,
-                              //                                       fontWeight: FontWeight.bold,
-                              //                                     )
-                              //                                 ),
-                              //                               ],
-                              //                             ),
-                              //                           ),
-                              //                         )
-                              //                     ),
-                              //                     Divider(
-                              //                       color : Colors.black,
-                              //                     ),
-                              //                     Expanded(
-                              //                         flex : 1,
-                              //                         child: Container(
-                              //                           padding: EdgeInsets.all(2),
-                              //                           child:   Column(
-                              //                             children: [
-                              //                               SizedBox(height: 20),
-                              //                               Text('Time : ',
-                              //                                 style: TextStyle(
-                              //                                   fontSize: 30,
-                              //                                 ),),
-                              //                               Text(displayTime1.substring(0, 8),
-                              //                                   style: TextStyle(
-                              //                                     fontSize: 90,
-                              //                                     fontWeight: FontWeight.bold,
-                              //                                   )
-                              //                               ),
-                              //                             ],
-                              //                           ),
-                              //                         )
-                              //                     ),
-                              //                     Divider(
-                              //                       color : Colors.black,
-                              //                     ),
-                              //                     Expanded(
-                              //                         flex : 1,
-                              //                         child: Container(
-                              //                           padding: EdgeInsets.all(2),
-                              //                           child:   Column(
-                              //                             children: [
-                              //                               SizedBox(height : 20),
-                              //                               Text('Time : ',
-                              //                                   style: TextStyle(
-                              //                                       fontSize: 30
-                              //                                   )),
-                              //                               Text(displayTime1.substring(0, 8),
-                              //                                   style: TextStyle(
-                              //                                     fontSize: 90,
-                              //                                     fontWeight: FontWeight.bold,
-                              //                                   )
-                              //                               ),
-                              //                             ],
-                              //                           ),
-                              //                         )
-                              //                     ),
-                              //                     Divider(
-                              //                       color : Colors.black,
-                              //                     ),
-                              //                     Expanded(
-                              //                         flex: 1,
-                              //                         child: Row(
-                              //                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              //                           children: [
-                              //                             ElevatedButton(onPressed: () {
-                              //
-                              //                             },
-                              //                               child: Icon(Icons.map),
-                              //                               style: ElevatedButton.styleFrom(
-                              //                                 backgroundColor: Colors.deepOrange,
-                              //                                 shape: CircleBorder(),
-                              //                                 fixedSize: Size(70, 70),
-                              //                               ),
-                              //                             ),
-                              //                             ElevatedButton(onPressed: () {
-                              //                               if (timeClock.isRunning) {
-                              //                                 timeClock.onStopTimer();
-                              //                                 setState(() {
-                              //
-                              //                                 });
-                              //                               } else {
-                              //                                 timeClock.onStartTimer();
-                              //                                 setState(() {
-                              //
-                              //                                 });
-                              //                               }
-                              //                             },
-                              //                               child: timeClock.isRunning ? Icon(Icons.stop, size: 40) : Icon(Icons.play_arrow, size : 40),
-                              //                               style: ElevatedButton.styleFrom(
-                              //                                 fixedSize: Size(70, 70),
-                              //                                 shape: CircleBorder(),
-                              //                                 backgroundColor: Colors.deepOrange,
-                              //                               ),
-                              //                             ),
-                              //                             ElevatedButton(
-                              //                               onPressed: () {
-                              //
-                              //                               } ,
-                              //                               child: Icon(Icons.wifi),
-                              //                               style: ElevatedButton.styleFrom(
-                              //                                 fixedSize: Size(70, 70),
-                              //                                 shape: BeveledRectangleBorder(),
-                              //                               ),
-                              //                             ),
-                              //                             ElevatedButton(
-                              //                               onPressed: () {
-                              //                                 // Hiển thị trang trượt lên khi nút được nhấn
-                              //                                 showModalBottomSheet(
-                              //                                   isScrollControlled: true,
-                              //                                   context: context,
-                              //                                   builder: (BuildContext context) {
-                              //                                     return MyBottomSheetContent();
-                              //                                   },
-                              //                                 );
-                              //                               },
-                              //                               child: Text('Mở trang trượt lên'),
-                              //                             ),
-                              //                           ],
-                              //                         )
-                              //                     ),
-                              //                   ],
-                              //                 )
-                              //             );
-                              //           });
-                              //           })
-                              //     );
                               setState(() {
                                 start = true;
                                 stop = true;
@@ -410,20 +218,7 @@ class _MyMapState extends State<MyMap> {
                               timeClock.onStopTimer();
                               exchange = true;
                               stop = false;
-                              setState(() {
-
-                              });
-                              // start = false;
-                              // List<GeoPoint> path = [];
-                              // for (LatLng latlng in points) {
-                              //   path.add(GeoPoint(latlng.latitude, latlng.longitude));
-                              // }
-                              // final user = <String, dynamic>{'distance' : dis, 'speed' : (double.parse(dis.substring(0, dis.length-3)) / ((double.parse(value.toString())) / (1000 * 3600))).toStringAsFixed(2) , 'time' : displayTime.substring(0, 8), 'path' : path, 'timeISO' : timeIso};
-                              // if (timeIso.isNotEmpty) {
-                              //   await _db.collection('information').add(user);
-                              // }
-                              // Navigator.pop(context, user);
-
+                              setState(() {});
                             }
 
                           },
