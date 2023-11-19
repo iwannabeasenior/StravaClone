@@ -4,7 +4,7 @@ import 'package:spotify_sdk/models/image_uri.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:stravaclone/garbage/sized_icon_button.dart';
-import 'font/heart.dart';
+import '../font/heart.dart';
 
 class SpotifyAPI extends StatefulWidget {
   const SpotifyAPI({super.key});

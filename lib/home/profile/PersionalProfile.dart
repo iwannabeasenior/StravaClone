@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:stravaclone/garbage/Profile.dart';
+import 'package:stravaclone/home/profile/Profile.dart';
 class ProfileMain extends StatefulWidget {
   const ProfileMain({super.key});
 
