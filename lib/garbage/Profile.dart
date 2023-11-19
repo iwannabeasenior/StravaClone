@@ -42,16 +42,16 @@ class _ProfileState extends State<Profile> {
                         )
 
                       ),
-                      maxY: 50,
+                      maxY: 10,
                       backgroundColor: Colors.amberAccent,
                       barGroups: [
-                        BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 10, width: 40),]),
-                        BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 20, width: 40)]),
-                        BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 30, width: 40)]),
-                        BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 30, width: 40)]),
-                        BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 30, width: 40)]),
-                        BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 30, width: 40)]),
-                        BarChartGroupData(x: 6, barRods: [BarChartRodData(toY: 30, width: 40)]),
+                        BarChartGroupData(x: 0, barRods: [BarChartRodData(toY: 3, width: 40),]),
+                        BarChartGroupData(x: 1, barRods: [BarChartRodData(toY: 5, width: 40)]),
+                        BarChartGroupData(x: 2, barRods: [BarChartRodData(toY: 6, width: 40)]),
+                        BarChartGroupData(x: 3, barRods: [BarChartRodData(toY: 1, width: 40)]),
+                        BarChartGroupData(x: 4, barRods: [BarChartRodData(toY: 2, width: 40)]),
+                        BarChartGroupData(x: 5, barRods: [BarChartRodData(toY: 7, width: 40)]),
+                        BarChartGroupData(x: 6, barRods: [BarChartRodData(toY: 3, width: 40)]),
                       ]
                     ),
                   ))

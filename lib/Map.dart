@@ -7,8 +7,9 @@ import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:stravaclone/SpotifyApi.dart';
+import 'package:stravaclone/font/weather.dart';
+import 'package:stravaclone/weather/api.dart';
 import 'font/my_flutter_app_icons.dart';
-
 class MyMap extends StatefulWidget {
   const MyMap({super.key});
   @override
@@ -16,6 +17,7 @@ class MyMap extends StatefulWidget {
 }
 
 class _MyMapState extends State<MyMap> {
+  late var currentWeather;
   bool granted = false;
   final Set<Polyline> _polyline = {};
   MapType _currentMapType = MapType.normal;
@@ -44,6 +46,11 @@ class _MyMapState extends State<MyMap> {
         color: Colors.red,
       )
     );
+    _db.collection('weather').get().then((event) {
+        for (var doc in event.docs) {
+          currentWeather = doc.data();
+        }
+    });
   }
   @override
   void dispose() {
@@ -127,7 +134,6 @@ class _MyMapState extends State<MyMap> {
                 ]
               )
             ),
-
           ],
         ),
 
@@ -273,7 +279,7 @@ class _MyMapState extends State<MyMap> {
                                           TextButton(onPressed: () {
                                             Navigator.pop(context);
                                             List<String> list = ['unvalid'];
-                                            List<GeoPoint> path = [GeoPoint(0, 0)];
+                                            List<GeoPoint> path = [const GeoPoint(0, 0)];
                                             final user = <String, dynamic>{'distance' : 'unvalid', 'speed' : 'unvalid', 'path' : path, 'timeISO' : list};
                                             ScaffoldMessenger.of(context).showSnackBar(
                                                 const SnackBar(content: Text(
@@ -303,10 +309,93 @@ class _MyMapState extends State<MyMap> {
                             ],
                           ),
                           ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  fixedSize: Size(60, 60),
+                                  shape: CircleBorder()
+                              ),
                               onPressed: () {
-
+                                showModalBottomSheet(
+                                    context: context,
+                                    builder: (context) {
+                                      return Scaffold(
+                                        backgroundColor: Colors.lightGreen,
+                                        body : Center(
+                                          child: Column (
+                                            crossAxisAlignment: CrossAxisAlignment.center,
+                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                            children: [
+                                              Text('Weather',
+                                              style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 32,
+                                                color: Colors.red,
+                                              )),
+                                              Text('Update : ${currentWeather['last_updated']}',
+                                              style: TextStyle(
+                                                fontSize: 20
+                                              )),
+                                              Text('${currentWeather['condition']['text']}',
+                                              style: TextStyle(
+                                                color: Colors.lightBlue,
+                                                fontSize: 30,
+                                                fontWeight: FontWeight.bold
+                                              ),),
+                                              Text('${currentWeather['temp_c']}' + ' C',
+                                              style: TextStyle(
+                                                fontSize: 20,
+                                                fontWeight: FontWeight.bold
+                                              )),
+                                              Text('Precipitation : ${currentWeather['precip_mm']} %'),
+                                              Text('Humidity : ${currentWeather['humidity']} %'),
+                                              Text('Wind : ${currentWeather['wind_mph']} mph')
+                                            ]
+                                          ),
+                                        ),
+                                           // Card(
+                                          //   color: Colors.lightGreenAccent,
+                                          //   child : Column(
+                                          //     children: [
+                                          //
+                                          //       ListTile(
+                                          //         leading: Icon(Icons.sunny),
+                                          //         title: Text('${currentWeather['temp_c']}' + ' C'),
+                                          //         subtitle: Column(
+                                          //           children: [
+                                          //             Text('Precipitation : ${currentWeather['precip_mm']} %'),
+                                          //             Text('Humidity : ${currentWeather['humidity']} %'),
+                                          //             Text('Wind : ${currentWeather['wind_mph']} mph')
+                                          //           ],
+                                          //         ),
+                                          //       )
+                                          //     ],
+                                          //   )
+                                          // ),
+                                        floatingActionButton: FloatingActionButton(
+                                          child : Icon(weather.arrows_cw),
+                                          onPressed: () async {
+                                            currentWeather = await api(currentLocation);
+                                            setState(() {});
+                                            _db.collection('weather').get().then((event) {
+                                              for (var doc in event.docs) {
+                                                doc.reference.update(
+                                                  {
+                                                    'condition' : currentWeather['condition'],
+                                                    'humidity' : currentWeather['humidity'],
+                                                    'precip_mm' : currentWeather['precip_mm'],
+                                                    'wind_mph' :currentWeather['wind_mph'],
+                                                    'last_updated' : currentWeather['last_updated'],
+                                                    'temp_c' : currentWeather['temp_c'],
+                                                  }
+                                                );
+                                              }
+                                            });
+                                          },
+                                        ),
+                                      );
+                                    });
                               },
-                              child: const Icon(Icons.map))
+                              child: const Icon(weather.cloud_sun_inv, size: 40,))
                         ],
                       )
                     )

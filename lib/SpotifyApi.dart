@@ -26,7 +26,6 @@ class _HomeState extends State<SpotifyAPI> {
     return First();
   }
   Widget First() {
-
       return  StreamBuilder(
         stream: SpotifySdk.subscribeConnectionStatus(),
         builder: (context, snapshot) {

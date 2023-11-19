@@ -9,7 +9,7 @@ import 'package:stravaclone/PersionalProfile.dart';
 import 'GenerateGPXFile.dart';
 import 'Map.dart';
 import 'firebase_options.dart';
-
+bool connect_spotify = false;
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -60,7 +60,7 @@ class _HomeState extends State<Home> {
                       return const ProfileMain();
                     }));
             },
-            icon: const Icon(Icons.supervised_user_circle),
+            icon: const Icon(Icons.supervised_user_circle,),
           ),
           IconButton(onPressed: () {
             Navigator.push(context, MaterialPageRoute(
@@ -218,7 +218,7 @@ class _HomeState extends State<Home> {
                     child: Column(
                       children: [
                         ListTile(
-                          leading: const Icon(Icons.supervised_user_circle_rounded, size: 50),
+                          leading: const Icon(Icons.supervised_user_circle_rounded, size: 50, color: Colors.red),
                           title: const Text(
                             'Nguyễn Trung Thành',
                             style: TextStyle(
@@ -265,7 +265,7 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         Container(
-                          color: Colors.grey,
+                          color: Colors.pink,
                           height: 70,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
