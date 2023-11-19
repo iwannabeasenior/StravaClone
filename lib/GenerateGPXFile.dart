@@ -22,13 +22,6 @@ Future<void> createGPXFile(List<LatLng> points, List<String> timeISO) async {
 
           ],
           [
-            // XmlElement(
-            //   XmlName('time'),
-            //   [],
-            //   [
-            //     XmlText(timeISO[0])
-            //   ]
-            // ),
             XmlElement(
               XmlName('name'),
               [],

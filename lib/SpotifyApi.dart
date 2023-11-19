@@ -1,14 +1,11 @@
-import 'dart:math';
-// import 'package:spotify_sdk/spotify_sdk.dart';
+
 import 'package:flutter/material.dart';
-import 'package:flutter_web_auth_2/flutter_web_auth_2.dart';
-import 'package:http/http.dart' as http;
 import 'package:spotify_sdk/models/image_uri.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:stravaclone/garbage/sized_icon_button.dart';
-
 import 'font/heart.dart';
+
 class SpotifyAPI extends StatefulWidget {
   const SpotifyAPI({super.key});
 
@@ -69,18 +66,18 @@ class _HomeState extends State<SpotifyAPI> {
                 shape: CircleBorder(),
                 fixedSize: Size(100, 100),
               ),
-              child: Center(child: Text('Get access token', textAlign: TextAlign.center,)),
+              child: const Center(child: Text('Get access token', textAlign: TextAlign.center,)),
           ),
           ElevatedButton(
               onPressed: () async {
                   await SpotifySdk.connectToSpotifyRemote(clientId: '47ddd41f0b974c40892de24a73dac073', redirectUrl: 'stravaflutter://redirect');
               } ,
-              child: Icon(Icons.settings_remote_rounded, size: 50,),
               style: ElevatedButton.styleFrom(
                 shape: CircleBorder(),
                 fixedSize: Size(100, 100),
                 backgroundColor: Colors.green,
               ),
+              child: Icon(Icons.settings_remote_rounded, size: 50,),
           ),
         ],
       ),
@@ -88,10 +85,10 @@ class _HomeState extends State<SpotifyAPI> {
   }
   Widget disConnected() {
     return Container(
-      child : Center(
+      color : Colors.lightBlue,
+      child : const Center(
         child : Text('Not connected'),
       ),
-      color : Colors.lightBlue,
     );
   }
   Widget connected() {
@@ -118,7 +115,7 @@ class _HomeState extends State<SpotifyAPI> {
                   children: [
                     Center(
                       child: Text(track.name,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 20
                         ),
@@ -185,15 +182,11 @@ class _HomeState extends State<SpotifyAPI> {
                                     )
                                 );
                               }
-
                             })
                       ],
                     ),
-
                   ],
                 )
-
-
               ],
           );
         });
@@ -230,6 +223,16 @@ class _HomeState extends State<SpotifyAPI> {
         });
   }
 }
+
+
+
+
+
+
+
+
+
+
 //   Random random = Random();
 //   String state = random.nextInt(1000000).toString();
 //   final url = Uri.https('accounts.spotify.com', 'authorize', {

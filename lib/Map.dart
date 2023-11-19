@@ -235,7 +235,7 @@ class _MyMapState extends State<MyMap> {
                               const Icon(Icons.stop, size: 20,)
                           )
                               : Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
                               ElevatedButton(onPressed: () {
                                 exchange = false;
@@ -303,7 +303,9 @@ class _MyMapState extends State<MyMap> {
                             ],
                           ),
                           ElevatedButton(
-                              onPressed: () {},
+                              onPressed: () {
+
+                              },
                               child: const Icon(Icons.map))
                         ],
                       )

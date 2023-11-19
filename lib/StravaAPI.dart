@@ -38,7 +38,6 @@ Future<void> APICall() async {
 
     final result = await FlutterWebAuth2.authenticate(
         url: url.toString(), callbackUrlScheme: 'stravaflutter');
-
     final code = Uri
         .parse(result)
         .queryParameters['code'];
@@ -71,9 +70,7 @@ Future<void> APICall() async {
     // });
 
   } else {
-    print('update data');
     final refreshTokenOld = token['refresh_token'];
-    print('refreshToken : $refreshTokenOld');
     final url = Uri.https('www.strava.com', '/api/v3/oauth/token');
     final response = await http.post(url, body : {
       'client_id' : '115822',
@@ -83,11 +80,6 @@ Future<void> APICall() async {
     });
     accessToken = jsonDecode(response.body)['access_token'] as String;
     refreshToken = jsonDecode(response.body)['refresh_token'] as String;
-    print('refreshTokenOld : $refreshTokenOld');
-    print('accessToken : $accessToken');
-
-
-    print('refreshToken : $refreshToken');
     await db.collection('token').get().then(
         (snapshot) {
           for (var doc in snapshot.docs) {
@@ -101,7 +93,6 @@ Future<void> APICall() async {
         }
     );
   }
-
   String? downloadsDirectoryPath = (await DownloadsPath.downloadsDirectory())?.path;
   final uploadUrl = Uri.parse('https://www.strava.com/api/v3/uploads');
   final request = http.MultipartRequest('POST', uploadUrl)

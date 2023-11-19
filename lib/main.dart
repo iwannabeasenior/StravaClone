@@ -16,32 +16,22 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  // // create new file named "gpxFake.gpx" to save activity
-  //
+  // create new file named "gpxFake.gpx" to save activity
   if (Platform.isAndroid && ! await File('/storage/emulated/0/Download/gpxFake.gpx').exists()) {
     await Directory('/storage/emulated/0/Download').create(recursive: true);
     File file = File('/storage/emulated/0/Download/gpxFake.gpx');
+    if (!(await Permission.storage.status.isGranted)) {
+      await Permission.storage.request();
+    }
     await file.writeAsString('Here your new file will save your activity');
   } else {
   }
   if (!(await Permission.storage.status.isGranted)) {
     await Permission.storage.request();
   }
-  runApp( MaterialApp(
-    theme :  ThemeData(
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.red
-      ),
-      colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange),
-      textTheme : const TextTheme(
-        displayLarge: TextStyle(
-          fontSize: 30,
-          fontWeight: FontWeight.bold
-        )
-      )
-    ),
+  runApp( const MaterialApp(
     debugShowCheckedModeBanner: false,
-    home : const SafeArea(child: Home()),
+    home : SafeArea(child: Home()),
   ));
 }
 class Home extends StatefulWidget {
@@ -185,27 +175,22 @@ class _HomeState extends State<Home> {
       floatingActionButton: FloatingActionButton(
         backgroundColor: Colors.white,
         onPressed: () async {
-          // final user = await Navigator.push(context, MaterialPageRoute(
-          //     builder: (context) {
-          //       return const SafeArea(child: MyMap());
-          //     }));
-          final user = await showModalBottomSheet(
-              isScrollControlled: true,
-              context: context,
+          final user = await Navigator.push(context, MaterialPageRoute(
               builder: (context) {
                 return const SafeArea(child: MyMap());
-              });
-          if (user['timeISO'].length > 0) {
+              }
+          ));
+          if (user['timeISO'].length > 0 && user['distance'] != 'unvalid') {
             List<LatLng> list = [];
             for (var coordinate in user['path']) {
               list.add(LatLng(coordinate.latitude, coordinate.longitude));
             }
             await createGPXFile(list, user['timeISO']);
             await APICall();
+            run.add(user);
             setState(()  {
-              run.add(user);
             });
-          } else {
+          } else if (user['timeISO'].length == 0){
             showDialog(context: context,
                 builder: (context) {
                   return const AlertDialog(
@@ -227,9 +212,30 @@ class _HomeState extends State<Home> {
           SliverList(
             delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index)  {
-                  return Container(
+                  return Card(
+                    shape: const CircleBorder(),
+                    margin: EdgeInsets.all(20),
                     child: Column(
                       children: [
+                        ListTile(
+                          leading: const Icon(Icons.supervised_user_circle_rounded, size: 50),
+                          title: const Text(
+                            'Nguyễn Trung Thành',
+                            style: TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold
+                            ),
+                          ),
+
+                          subtitle: Row(
+                            children: [
+                              const Icon(Icons.snowshoeing),
+                              Text(
+                                  run[index]['timeISO'][run[index]['timeISO'].length-1] + ' at Thanh Tri, HN'
+                              ),
+                            ],
+                          ),
+                        ),
                         GestureDetector(
                           onTap : () {
                             Navigator.push(context, MaterialPageRoute(
@@ -259,24 +265,24 @@ class _HomeState extends State<Home> {
                           ),
                         ),
                         Container(
-                          color: Colors.amber,
-                          height: 40,
+                          color: Colors.grey,
+                          height: 70,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
                               Text('Distance : ${run[index]['distance']}',
                               style: const TextStyle(
-                                color: Colors.red,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               )),
                               Text('Speed : ${run[index]['speed']} km/h',
                               style : const TextStyle(
-                                color: Colors.red,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold
                               )),
                               Text('Time : ${run[index]['time']}',
                               style : const TextStyle(
-                                color: Colors.red,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold
                               )),
                             ],
