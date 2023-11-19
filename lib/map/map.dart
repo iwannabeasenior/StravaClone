@@ -6,10 +6,10 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_maps_routes/google_maps_routes.dart';
 import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
-import 'package:stravaclone/map/SpotifyApi.dart';
+import 'package:stravaclone/map/spotify_api.dart';
 import 'package:stravaclone/font/weather.dart';
 import 'package:stravaclone/map/weather_api.dart';
-import '../font/my_flutter_app_icons.dart';
+import '../font/spotify.dart';
 class MyMap extends StatefulWidget {
   const MyMap({super.key});
   @override

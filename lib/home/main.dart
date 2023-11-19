@@ -4,10 +4,10 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:stravaclone/map/StravaAPI.dart';
-import 'package:stravaclone/profile/PersionalProfile.dart';
-import '../map/GenerateGPXFile.dart';
-import '../map/Map.dart';
+import 'package:stravaclone/map/strava_api.dart';
+import 'package:stravaclone/home/profile/profile_main.dart';
+import '../map/generate_gpx_file.dart';
+import '../map/map.dart';
 import 'firebase_options.dart';
 bool connect_spotify = false;
 void main() async {

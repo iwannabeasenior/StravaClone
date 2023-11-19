@@ -1,6 +1,6 @@
 
 import 'package:flutter/material.dart';
-import 'package:stravaclone/home/profile/Profile.dart';
+import 'package:stravaclone/home/profile/chart.dart';
 class ProfileMain extends StatefulWidget {
   const ProfileMain({super.key});
 
@@ -122,7 +122,7 @@ class _ProfileMainState extends State<ProfileMain> {
                   ) ),
                   Expanded(flex : 4, child: Container(
                       margin: EdgeInsets.all(10),
-                      child: const Profile())),
+                      child: const Chart())),
                 ],
               ),
           ),

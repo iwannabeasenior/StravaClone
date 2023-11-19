@@ -2,17 +2,17 @@ import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 void main() {
   runApp(MaterialApp(
-    home : Profile(),
+    home : Chart(),
   ));
 }
-class Profile extends StatefulWidget {
-  const Profile({super.key});
+class Chart extends StatefulWidget {
+  const Chart({super.key});
 
   @override
-  State<Profile> createState() => _ProfileState();
+  State<Chart> createState() => _ChartState();
 }
 
-class _ProfileState extends State<Profile> {
+class _ChartState extends State<Chart> {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
