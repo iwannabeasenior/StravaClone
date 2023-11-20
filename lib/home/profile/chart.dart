@@ -1,10 +1,6 @@
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
-void main() {
-  runApp(MaterialApp(
-    home : Chart(),
-  ));
-}
+
 class Chart extends StatefulWidget {
   const Chart({super.key});
 

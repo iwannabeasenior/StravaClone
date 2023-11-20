@@ -9,7 +9,7 @@ import 'package:stravaclone/home/profile/profile_main.dart';
 import '../map/generate_gpx_file.dart';
 import '../map/map.dart';
 import 'firebase_options.dart';
-bool connect_spotify = false;
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
@@ -76,7 +76,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                     ),
-                    body: const Text('123'),
+                    body: const Center(child: Text('Coming soon')),
 
                   );
                 }));
@@ -102,20 +102,22 @@ class _HomeState extends State<Home> {
                       body : CustomScrollView(
                           slivers: <Widget> [
                             SliverList (
-                              delegate: SliverChildBuilderDelegate((context, index) =>  Container(
+                              delegate: SliverChildBuilderDelegate((context, index) =>  Card(child : Container(
                                 color : index % 2 == 1 ? Colors.amberAccent : Colors.greenAccent,
                                 height: 80,
                                 child: GestureDetector(child : Column(
                                   children: [
                                     const Icon(Icons.snowshoeing),
+                                    const SizedBox(height: 10,),
                                     Text(
                                       'You completed a new activity at ${run[index]['timeISO'][run[index]['timeISO'].length-1] as String}',
                                     style: const TextStyle(
                                       fontWeight: FontWeight.bold
                                     )),
+                                    const SizedBox(height: 10,),
                                     const Text(
                                       'Go dive into those stats!'
-                                    )
+                                    ),
                                   ],
                                 ),
                                   onTap : () {
@@ -153,7 +155,7 @@ class _HomeState extends State<Home> {
                                         }));
                                   },
                                 ),
-                              ),
+                              ),),
                                   childCount: run.length),
                             ),
                           ],
@@ -163,7 +165,6 @@ class _HomeState extends State<Home> {
 
           }, icon: const Icon(Icons.add_alert_rounded)),
         ],
-        // backgroundColor: Colors.black12,
         title: const Center(
           child: Text('Your routes',style: TextStyle(
             color: Colors.greenAccent,

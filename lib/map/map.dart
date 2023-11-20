@@ -17,7 +17,6 @@ class MyMap extends StatefulWidget {
 }
 
 class _MyMapState extends State<MyMap> {
-  late var currentWeather;
   bool granted = false;
   final Set<Polyline> _polyline = {};
   MapType _currentMapType = MapType.normal;
@@ -46,11 +45,6 @@ class _MyMapState extends State<MyMap> {
         color: Colors.red,
       )
     );
-    _db.collection('weather').get().then((event) {
-        for (var doc in event.docs) {
-          currentWeather = doc.data();
-        }
-    });
   }
   @override
   void dispose() {
@@ -59,7 +53,7 @@ class _MyMapState extends State<MyMap> {
   }
   @override
   Widget build(BuildContext context) {
-    return currentLocation == null ? const Scaffold(body : Center(child: Text('Waiting for creating map...', textAlign: TextAlign.center,))) :
+    return currentLocation == null ? const Scaffold(body : Center(child: CircularProgressIndicator())) :
       SafeArea(child: Scaffold(
         appBar: AppBar(
           title: const Center(child : Text('Run')),
@@ -314,84 +308,29 @@ class _MyMapState extends State<MyMap> {
                                   fixedSize: Size(60, 60),
                                   shape: CircleBorder()
                               ),
-                              onPressed: () {
+                              onPressed: () async{
+                                Widget weather = await weatherAPI(currentLocation);
+                                // currentWeather = await api(currentLocation);
+                                // _db.collection('weather').get().then((event) {
+                                //   for (var doc in event.docs) {
+                                //     doc.reference.update(
+                                //         {
+                                //           'condition' : currentWeather['condition'],
+                                //           'humidity' : currentWeather['humidity'],
+                                //           'precip_mm' : currentWeather['precip_mm'],
+                                //           'wind_mph' :currentWeather['wind_mph'],
+                                //           'last_updated' : currentWeather['last_updated'],
+                                //           'temp_c' : currentWeather['temp_c'],
+                                //         }
+                                //     );
+                                //   }
+                                // });
                                 showModalBottomSheet(
                                     context: context,
                                     builder: (context) {
                                       return Scaffold(
                                         backgroundColor: Colors.lightGreen,
-                                        body : Center(
-                                          child: Column (
-                                            crossAxisAlignment: CrossAxisAlignment.center,
-                                            mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                            children: [
-                                              Text('Weather',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 32,
-                                                color: Colors.red,
-                                              )),
-                                              Text('Update : ${currentWeather['last_updated']}',
-                                              style: TextStyle(
-                                                fontSize: 20
-                                              )),
-                                              Text('${currentWeather['condition']['text']}',
-                                              style: TextStyle(
-                                                color: Colors.lightBlue,
-                                                fontSize: 30,
-                                                fontWeight: FontWeight.bold
-                                              ),),
-                                              Text('${currentWeather['temp_c']}' + ' C',
-                                              style: TextStyle(
-                                                fontSize: 20,
-                                                fontWeight: FontWeight.bold
-                                              )),
-                                              Text('Precipitation : ${currentWeather['precip_mm']} %'),
-                                              Text('Humidity : ${currentWeather['humidity']} %'),
-                                              Text('Wind : ${currentWeather['wind_mph']} mph')
-                                            ]
-                                          ),
-                                        ),
-                                           // Card(
-                                          //   color: Colors.lightGreenAccent,
-                                          //   child : Column(
-                                          //     children: [
-                                          //
-                                          //       ListTile(
-                                          //         leading: Icon(Icons.sunny),
-                                          //         title: Text('${currentWeather['temp_c']}' + ' C'),
-                                          //         subtitle: Column(
-                                          //           children: [
-                                          //             Text('Precipitation : ${currentWeather['precip_mm']} %'),
-                                          //             Text('Humidity : ${currentWeather['humidity']} %'),
-                                          //             Text('Wind : ${currentWeather['wind_mph']} mph')
-                                          //           ],
-                                          //         ),
-                                          //       )
-                                          //     ],
-                                          //   )
-                                          // ),
-                                        floatingActionButton: FloatingActionButton(
-                                          child : Icon(weather.arrows_cw),
-                                          onPressed: () async {
-                                            currentWeather = await api(currentLocation);
-                                            setState(() {});
-                                            _db.collection('weather').get().then((event) {
-                                              for (var doc in event.docs) {
-                                                doc.reference.update(
-                                                  {
-                                                    'condition' : currentWeather['condition'],
-                                                    'humidity' : currentWeather['humidity'],
-                                                    'precip_mm' : currentWeather['precip_mm'],
-                                                    'wind_mph' :currentWeather['wind_mph'],
-                                                    'last_updated' : currentWeather['last_updated'],
-                                                    'temp_c' : currentWeather['temp_c'],
-                                                  }
-                                                );
-                                              }
-                                            });
-                                          },
-                                        ),
+                                        body :  weather,
                                       );
                                     });
                               },

@@ -1,7 +1,11 @@
 
 import 'package:flutter/material.dart';
+import 'package:spotify_sdk/models/album.dart';
 import 'package:spotify_sdk/models/image_uri.dart';
+import 'package:spotify_sdk/models/player_options.dart' as player_options;
+import 'package:spotify_sdk/models/player_restrictions.dart';
 import 'package:spotify_sdk/models/player_state.dart';
+import 'package:spotify_sdk/models/track.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:stravaclone/garbage/sized_icon_button.dart';
 import '../font/heart.dart';
@@ -62,8 +66,8 @@ class _HomeState extends State<SpotifyAPI> {
               },
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.green,
-                shape: CircleBorder(),
-                fixedSize: Size(100, 100),
+                shape: const CircleBorder(),
+                fixedSize: const Size(100, 100),
               ),
               child: const Center(child: Text('Get access token', textAlign: TextAlign.center,)),
           ),
@@ -72,11 +76,11 @@ class _HomeState extends State<SpotifyAPI> {
                   await SpotifySdk.connectToSpotifyRemote(clientId: '47ddd41f0b974c40892de24a73dac073', redirectUrl: 'stravaflutter://redirect');
               } ,
               style: ElevatedButton.styleFrom(
-                shape: CircleBorder(),
-                fixedSize: Size(100, 100),
+                shape: const CircleBorder(),
+                fixedSize: const Size(100, 100),
                 backgroundColor: Colors.green,
               ),
-              child: Icon(Icons.settings_remote_rounded, size: 50,),
+              child: const Icon(Icons.settings_remote_rounded, size: 50,),
           ),
         ],
       ),
@@ -92,14 +96,36 @@ class _HomeState extends State<SpotifyAPI> {
   }
   Widget connected() {
     return StreamBuilder<PlayerState>(
+        // initialData: PlayerState(
+        //     Track(
+        //         Album('name', ),
+        //         Arti,
+        //         artists,
+        //         duration,
+        //         ,
+        //         name,
+        //         uri,
+        //         linkedFromUri,
+        //         isEpisode: true,
+        //         isPodcast: true),
+        //     2,
+        //     0,
+        //     player_options.PlayerOptions(player_options.RepeatMode.off, isShuffling: false),
+        //     PlayerRestrictions(canSkipNext: true, canSkipPrevious: true, canRepeatTrack: true, canRepeatContext: true, canToggleShuffle: true, canSeek: true),
+        //     isPaused: true),
         stream: SpotifySdk.subscribePlayerState(),
         builder: (context, snapshot) {
           var track = snapshot.data?.track;
           currentTrackImageUri = track?.imageUri;
           var playerState = snapshot.data;
           if (playerState == null || track == null) {
-            return Center(
-              child: Container(
+            return const Center(
+              child:  Text(
+                'Waiting...',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 25,
+                ),
               ),
             );
           }
@@ -127,6 +153,7 @@ class _HomeState extends State<SpotifyAPI> {
                             width: 50,
                             icon: Icons.repeat,
                             onPressed: () async {
+                              await SpotifySdk.setRepeatMode(repeatMode: RepeatMode.track);
                               await SpotifySdk.toggleRepeat();
                             }),
                         SizedIconButton(
