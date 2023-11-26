@@ -248,25 +248,14 @@ class _HomeState extends State<Home> {
                                     list.add(LatLng(coordinate.latitude, coordinate.longitude));
                                   }
                                   return VietmapGL(
+                                      zoomGesturesEnabled: true,
                                       initialCameraPosition: CameraPosition(
                                         target: list.isEmpty ? const LatLng(0, 0) : LatLng(list[0].latitude, list[0].longitude),
                                         zoom: 18
                                       ),
                                       styleString: 'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
                                   );
-                                  // return GoogleMap(
-                                  //     initialCameraPosition: CameraPosition(
-                                  //         target: list.isEmpty ? const LatLng(0,0) : LatLng(list[0].latitude, list[0].longitude),
-                                  //         zoom: 18
-                                  //     ),
-                                  //     polylines: {
-                                  //       Polyline(
-                                  //         polylineId: const PolylineId('A'),
-                                  //         points: list,
-                                  //         color : Colors.red,
-                                  //       )
-                                  //     }
-                                  // );
+
                                 }));
                           },
                           child: const Image(image : AssetImage('asset/image/map.png'),

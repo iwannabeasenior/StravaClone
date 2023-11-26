@@ -18,27 +18,21 @@ class MyMap extends StatefulWidget {
 }
 
 class _MyMapState extends State<MyMap> {
-  // late Completer<VietmapController> completer = Completer<VietmapController> ();
+
   late VietmapController controller;
   bool isMapOpen = false;
   bool granted = false;
   double distance  = 0;
-  // final Set<Polyline> _polyline = {};
-  // MapType _currentMapType = MapType.normal;
-  // late GoogleMapController controllerMap;
   final timeClock = StopWatchTimer();
   String dis = '0.00';
   bool start = false;
   bool exchange = false;
   bool stop = false;
   double zoom = 20;
-
-  // DistanceCalculator distance = DistanceCalculator();
   final List<LatLng> points = [];
   final List<String> timeIso = [];
   final List<String> times = [];
   LatLng? currentLocation;
-
   final _db = FirebaseFirestore.instance;
 
   @override
@@ -100,16 +94,11 @@ class _MyMapState extends State<MyMap> {
               styleString: 'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
               onMapCreated: (VietmapController controllerMap) {
                 controller = controllerMap;
-                // completer.complete(controller);
               },
               myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
               zoomGesturesEnabled: true,
               onUserLocationUpdated: (UserLocation location) async {
                 currentLocation = location.position;
-                // if (!granted) {
-                //   controller = await completer.future;
-                //   granted  = true;
-                // }
                 zoom = controller.cameraPosition!.zoom;
                 await controller.animateCamera(CameraUpdate.newCameraPosition(
                     CameraPosition(target: location.position, zoom: zoom)));
@@ -134,66 +123,13 @@ class _MyMapState extends State<MyMap> {
                           draggable: true
                       )
                   );
-                  // await controller.updatePolyline(
-                  //     line,
-                  //     PolylineOptions(
-                  //       geometry: points,
-                  //       polylineColor: Colors.red,
-                  //       polylineWidth: 14,
-                  //       polylineOpacity: 1,
-                  //     ));
                   setState(() {});
                 }
               },
-              // onMapRenderedCallback: () {
-              //   Future<VietmapController> p = completer.future;
-              //   p.then((value) {
-              //     controller = value;
-              //     granted = true;
-              //   });
-              // },
               compassEnabled: true,
               trackCameraPosition: true,
               myLocationEnabled: true,
             ),
-            // Align(
-            //     alignment: Alignment.centerRight,
-            //     child : PopupMenuButton(
-            //         child : const Icon(Icons.layers, size: 50, color: Colors.black38),
-            //         onSelected: (value) {
-            //           if (value == TypeMap.Standard) {
-            //             _currentMapType = MapType.normal;
-            //             setState(() {
-            //
-            //             });
-            //           } else if (value == TypeMap.Satellite) {
-            //             _currentMapType = MapType.satellite;
-            //             setState(() {
-            //
-            //             });
-            //           } else {
-            //             _currentMapType = MapType.hybrid;
-            //             setState(() {
-            //
-            //             });
-            //           }
-            //         },
-            //         itemBuilder: (context) => const [
-            //           PopupMenuItem(
-            //               value : TypeMap.Standard,
-            //               child: Text('Standard')
-            //           ),
-            //           PopupMenuItem(
-            //               value : TypeMap.Satellite,
-            //               child: Text('Satellite')
-            //           ),
-            //           PopupMenuItem(
-            //               value : TypeMap.Hybrid,
-            //               child: Text('Hybrid')
-            //           )
-            //         ]
-            //     )
-            // ),
           ],
         ),
 
@@ -461,64 +397,3 @@ class _MyMapState extends State<MyMap> {
     );
   }
 }
-  //
-  // Future<void> cameraPositionChange(LatLng pos) async {
-  //   if (!granted) {
-  //     controllerMap = await _controller.future;
-  //     granted = true;
-  //   }
-  //   CameraPosition cameraPosition = CameraPosition(target: pos, zoom : zoom);
-  //   await controllerMap.animateCamera(CameraUpdate.newCameraPosition(cameraPosition));
-  // }
-
-  // Future<void> checkPermision() async {
-  //   Location location = Location();
-  //   bool serviceEnabled;
-  //   PermissionStatus permissionStatus;
-  //   LocationData locationData;
-  //   serviceEnabled = await location.serviceEnabled();
-  //   if (serviceEnabled) {
-  //     serviceEnabled = await location.requestService();
-  //     if (!serviceEnabled) {
-  //       return ;
-  //     }
-  //   }
-  //   permissionStatus = await location.hasPermission();
-  //   if (permissionStatus == PermissionStatus.denied) {
-  //     permissionStatus = await location.requestPermission();
-  //     if (permissionStatus != PermissionStatus.granted) {
-  //       return ;
-  //     }
-  //   }
-  //
-  //   locationData = await location.getLocation().then(
-  //           (value) {
-  //         currentLocation = LatLng(value.latitude!, value.longitude!);
-  //         setState(() {
-  //         });
-  //         return value;
-  //       }
-  //   );
-  //
-  //   location.onLocationChanged.listen((LocationData locationData) async {
-  //     currentLocation = LatLng(locationData.latitude!, locationData.longitude!);
-  //     if (stop) {
-  //       points.add(currentLocation!);
-  //       timeIso.add('${DateTime.now().toUtc().toIso8601String().substring(0, 19)}Z');
-  //       _polyline.add(
-  //           Polyline(
-  //             polylineId: const PolylineId('A'),
-  //             points: points,
-  //             color: Colors.red,
-  //           )
-  //       );
-  //       dis = distance.calculateRouteDistance(points, decimals: 2);
-  //     }
-  //     await cameraPositionChange(currentLocation!);
-  //     setState(() {});
-  //   });
-  // }
-
-// enum TypeMap {
-//   Standard, Satellite, Hybrid;
-// }
