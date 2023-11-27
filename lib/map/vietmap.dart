@@ -39,7 +39,7 @@ class _MyMapState extends State<MyMap> {
   void initState() {
     checkPermision();
     super.initState();
-    Future.delayed(Duration(seconds: 4)).then((value) {
+    Future.delayed(const Duration(seconds: 3)).then((value) {
       setState(() {isMapOpen = true;});
     });
   }
@@ -369,7 +369,6 @@ class _MyMapState extends State<MyMap> {
   }
 
   Future<void> checkPermision() async {
-
     Location location = Location();
     bool serviceEnabled;
     PermissionStatus permissionStatus;

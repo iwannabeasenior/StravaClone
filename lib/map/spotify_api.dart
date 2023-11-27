@@ -149,40 +149,62 @@ class _HomeState extends State<SpotifyAPI> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceAround,
                       children: [
-                        SizedIconButton(
-                            width: 50,
-                            icon: Icons.repeat,
+                        ElevatedButton(
                             onPressed: () async {
                               await SpotifySdk.setRepeatMode(repeatMode: RepeatMode.track);
                               await SpotifySdk.toggleRepeat();
-                            }),
-                        SizedIconButton(
-                            width: 50,
-                            icon: Icons.skip_previous,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(50, 50),
+                              backgroundColor: Colors.green,
+                              shape: CircleBorder(),
+                            ),
+                            child: Icon(Icons.repeat)),
+
+                        ElevatedButton(
                             onPressed: () async {
                               await SpotifySdk.skipPrevious();
-                            }),
-                        playerState.isPaused ? SizedIconButton(
-                            width: 50,
-                            icon: Icons.play_arrow,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(50, 50),
+                              backgroundColor: Colors.green,
+                              shape: CircleBorder(),
+                            ),
+                            child: Icon(Icons.skip_previous)),
+
+                        playerState.isPaused ? ElevatedButton(
                             onPressed: () async {
                               await SpotifySdk.resume();
-                            }) :
-                        SizedIconButton(
-                            width: 50,
-                            icon: Icons.pause_circle_outline,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(50, 50),
+                              backgroundColor: Colors.green,
+                              shape: CircleBorder(),
+                            ),
+                            child: Icon(Icons.play_arrow)) :
+                        ElevatedButton(
                             onPressed: () async {
                               await SpotifySdk.pause();
-                            }),
-                        SizedIconButton(
-                            width: 50,
-                            icon: Icons.skip_next,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(50, 50),
+                              backgroundColor: Colors.green,
+                              shape: CircleBorder(),
+                            ),
+                            child: Icon(Icons.pause_circle_outline)),
+
+                        ElevatedButton(
                             onPressed: () async {
                               await SpotifySdk.skipNext();
-                            }),
-                        SizedIconButton(
-                            width: 50,
-                            icon: Heart.heart,
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(50, 50),
+                              backgroundColor: Colors.green,
+                              shape: CircleBorder(),
+                            ),
+                            child: Icon(Icons.skip_next)),
+
+                        ElevatedButton(
                             onPressed: () async {
                               var state = await SpotifySdk.getLibraryState(spotifyUri: track.uri);
                               if (state!.isSaved) {
@@ -208,7 +230,13 @@ class _HomeState extends State<SpotifyAPI> {
                                     )
                                 );
                               }
-                            })
+                            },
+                            style: ElevatedButton.styleFrom(
+                              fixedSize: Size(50, 50),
+                              backgroundColor: Colors.green,
+                              shape: CircleBorder(),
+                            ),
+                            child: Icon(Heart.heart,)),
                       ],
                     ),
                   ],
@@ -259,18 +287,3 @@ class _HomeState extends State<SpotifyAPI> {
 
 
 
-//   Random random = Random();
-//   String state = random.nextInt(1000000).toString();
-//   final url = Uri.https('accounts.spotify.com', 'authorize', {
-//     'response_type': 'code',
-//     'client_id': '47ddd41f0b974c40892de24a73dac073',
-//     'redirect_uri': 'stravaflutter://redirect',
-//     'approval_prompt': 'force',
-//     'scope': 'user-read-private user-read-email',
-//     'state': state,
-//   });
-//   final result = await FlutterWebAuth2.authenticate(
-//       url: url.toString(), callbackUrlScheme: 'stravaflutter');
-//
-//   final code = Uri.parse(result).queryParameters['code'];
-//   print('code is $code');

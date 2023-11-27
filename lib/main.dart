@@ -7,9 +7,8 @@ import 'package:stravaclone/map/vietmap.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart' ;
 import 'package:stravaclone/map/strava_api.dart';
 import 'package:stravaclone/home/profile/profile_main.dart';
-import '../map/generate_gpx_file.dart';
-
-import 'firebase_options.dart';
+import 'map/generate_gpx_file.dart';
+import 'home/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -247,6 +246,7 @@ class _HomeState extends State<Home> {
                                   for (var coordinate in run[index]['path']) {
                                     list.add(LatLng(coordinate.latitude, coordinate.longitude));
                                   }
+                                  late VietmapController controller;
                                   return VietmapGL(
                                       zoomGesturesEnabled: true,
                                       initialCameraPosition: CameraPosition(
@@ -254,8 +254,25 @@ class _HomeState extends State<Home> {
                                         zoom: 18
                                       ),
                                       styleString: 'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
+                                      onMapCreated: (VietmapController controllerMap) async {
+                                        controller = controllerMap;
+                                        setState(() {});
+                                      },
+                                    onMapRenderedCallback: () async {
+                                        // controller work properly only if Map is rendered fullly
+                                        await controller.addPolyline(
+                                          PolylineOptions(
+                                            polylineWidth: 14,
+                                            polylineOpacity: 1,
+                                            draggable: true,
+                                            geometry: list,
+                                            polylineColor: Colors.red,
+                                          ));
+                                        setState(() {});
+                                        // dispose after draw polyline
+                                        controller.dispose();
+                                    },
                                   );
-
                                 }));
                           },
                           child: const Image(image : AssetImage('asset/image/map.png'),
