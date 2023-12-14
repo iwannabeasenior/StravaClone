@@ -35,24 +35,24 @@ class _VietMapState extends State<VietMap> {
       children: [
         VietmapGL(
             initialCameraPosition: CameraPosition(target: LatLng(90, 100), zoom: 30),
-            styleString: 'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
-            onMapCreated: (VietmapController controller) {
-              completer.complete(controller);
-            },
-            myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
-            zoomGesturesEnabled: true,
-            onUserLocationUpdated: (UserLocation location) {
-              // controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: location.position)));
-            },
-            onMapRenderedCallback: ()  {
-              Future<VietmapController> p = completer.future;
-              p.then((value) {
-                controller = value;
-              });
-            },
-            compassEnabled: true,
-            trackCameraPosition: true,
-            myLocationEnabled: true,
+            styleString: 'https://maps.vietmap.vn/api/maps/dark/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
+            // onMapCreated: (VietmapController controller) {
+            //   completer.complete(controller);
+            // },
+            // myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
+            // zoomGesturesEnabled: true,
+            // onUserLocationUpdated: (UserLocation location) {
+            //   // controller.animateCamera(CameraUpdate.newCameraPosition(CameraPosition(target: location.position)));
+            // },
+            // onMapRenderedCallback: ()  {
+            //   Future<VietmapController> p = completer.future;
+            //   p.then((value) {
+            //     controller = value;
+            //   });
+            // },
+            // compassEnabled: true,
+            // trackCameraPosition: true,
+            // myLocationEnabled: true,
         ),
         // MarkerLayer(
         //     ignorePointer: true,

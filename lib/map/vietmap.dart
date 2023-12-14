@@ -18,8 +18,8 @@ class MyMap extends StatefulWidget {
 }
 
 class _MyMapState extends State<MyMap> {
-
   late VietmapController controller;
+  bool setZoom = false;
   bool isMapOpen = false;
   bool granted = false;
   double distance  = 0;
@@ -95,11 +95,14 @@ class _MyMapState extends State<MyMap> {
               onMapCreated: (VietmapController controllerMap) {
                 controller = controllerMap;
               },
-              myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
-              zoomGesturesEnabled: true,
+
               onUserLocationUpdated: (UserLocation location) async {
                 currentLocation = location.position;
                 zoom = controller.cameraPosition!.zoom;
+                if (!setZoom) {
+                  zoom = 18;
+                  setZoom = true;
+                } // set first zoom of camera = 18
                 await controller.animateCamera(CameraUpdate.newCameraPosition(
                     CameraPosition(target: location.position, zoom: zoom)));
                 if (stop) {
@@ -126,9 +129,16 @@ class _MyMapState extends State<MyMap> {
                   setState(() {});
                 }
               },
+              myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
+              myLocationRenderMode: MyLocationRenderMode.COMPASS,
+              zoomGesturesEnabled: true,
               compassEnabled: true,
               trackCameraPosition: true,
               myLocationEnabled: true,
+              doubleClickZoomEnabled: true,
+              dragEnabled: true,
+              rotateGesturesEnabled: true,
+              scrollGesturesEnabled: true,
             ),
           ],
         ),
@@ -192,173 +202,182 @@ class _MyMapState extends State<MyMap> {
                         ],
                       ),
                       const Divider(color: Colors.grey),
-                      Center(
-                          child: Row(
+
+                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceAround,
                             children: [
-                              ElevatedButton(
-                                onPressed: () {
-                                  showModalBottomSheet(
-                                      elevation: 3,
-                                      context: context,
-                                      builder: (context) {
-                                        return const SizedBox(
-                                            height: 300,
-                                            child: SpotifyAPI());
-                                      });
-                                },
-                                style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.green,
-                                    fixedSize: const Size(60, 60),
-                                    shape: const CircleBorder()
+                              Expanded(
+                                flex: 1,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    showModalBottomSheet(
+                                        elevation: 3,
+                                        context: context,
+                                        builder: (context) {
+                                          return const SizedBox(
+                                              height: 300,
+                                              child: SpotifyAPI());
+                                        });
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.green,
+                                      fixedSize: const Size(60, 60),
+                                      shape: const CircleBorder()
+                                  ),
+                                  child: const Icon(Spotify.spotify, size: 40),
                                 ),
-                                child: const Icon(Spotify.spotify, size: 40),
                               ),
 
-                              !exchange ? ElevatedButton(onPressed: () async {
-                                if (!start) {
-                                  timeClock.onStartTimer();
-                                  setState(() {
-                                    start = true;
-                                    stop = true;
-                                  });
-                                } else {
-                                  timeClock.onStopTimer();
-                                  exchange = true;
-                                  stop = false;
-                                  setState(() {});
-                                }
-                              },
-                                  style: ElevatedButton.styleFrom(
-                                      shape: const CircleBorder(),
-                                      fixedSize: const Size(80, 80),
-                                      backgroundColor: Colors.deepOrange,
-                                      shadowColor: Colors.lightBlueAccent
-                                  )
-                                  , child: !start ? const Text('START',
-                                    style: TextStyle(
-                                        fontSize: 13
-                                    ),) :
-                                  const Icon(Icons.stop, size: 20,)
-                              )
-                                  : Row(
-                                mainAxisAlignment: MainAxisAlignment
-                                    .spaceAround,
-                                children: [
-                                  ElevatedButton(onPressed: () {
-                                    exchange = false;
+                              Expanded(
+                                flex: 2,
+                                child: !exchange ? ElevatedButton(onPressed: () async {
+                                  if (!start) {
                                     timeClock.onStartTimer();
-                                    stop = true;
-                                  },
+                                    setState(() {
+                                      start = true;
+                                      stop = true;
+                                    });
+                                  } else {
+                                    timeClock.onStopTimer();
+                                    exchange = true;
+                                    stop = false;
+                                    setState(() {});
+                                  }
+                                },
                                     style: ElevatedButton.styleFrom(
                                         shape: const CircleBorder(),
                                         fixedSize: const Size(80, 80),
                                         backgroundColor: Colors.deepOrange,
                                         shadowColor: Colors.lightBlueAccent
-                                    ),
-                                    child: const Text('RESUME',
+                                    )
+                                    , child: !start ? const Text('START',
                                       style: TextStyle(
-                                          fontSize: 12
-                                      ),),),
-                                  ElevatedButton(onPressed: () {
-                                    showDialog(context: context,
-                                        builder: (context) {
-                                          return AlertDialog(
-                                            title: const Text(
-                                                'Do you wanna save this acitivity ?'),
-                                            actions: [
-                                              TextButton(onPressed: () async {
-                                                List<GeoPoint> path = [];
-                                                for (LatLng latlng in points) {
-                                                  path.add(GeoPoint(
-                                                      latlng.latitude,
-                                                      latlng.longitude));
-                                                }
-                                                final user = <String, dynamic>{
-                                                  'distance': dis,
-                                                  'speed': (double.parse(
-                                                      dis) /
-                                                      ((double.parse(value
-                                                          .toString())) /
-                                                          (1000 * 3600)))
-                                                      .toStringAsFixed(2),
-                                                  'time': displayTime.substring(
-                                                      0, 8),
-                                                  'path': path,
-                                                  'timeISO': timeIso
-                                                };
-                                                if (timeIso.isNotEmpty) {
-                                                  await _db.collection(
-                                                      'information').add(user);
-                                                }
-                                                Navigator.pop(context);
-                                                Navigator.pop(context, user);
-                                              }, child: const Text('Yes')),
-                                              TextButton(onPressed: () {
-                                                Navigator.pop(context);
-                                                List<String> list = ['unvalid'];
-                                                List<GeoPoint> path = [
-                                                  const GeoPoint(0, 0)
-                                                ];
-                                                final user = <String, dynamic>{
-                                                  'distance': 'unvalid',
-                                                  'speed': 'unvalid',
-                                                  'path': path,
-                                                  'timeISO': list
-                                                };
-                                                ScaffoldMessenger.of(context)
-                                                    .showSnackBar(
-                                                    const SnackBar(
-                                                        content: Text(
-                                                          'UnSaved',
-                                                          style: TextStyle(
-                                                            fontSize: 20,
-                                                            fontWeight: FontWeight
-                                                                .bold,
-                                                            color: Colors.red,
-                                                          ),
-                                                        )));
-                                                Navigator.pop(context, user);
-                                              }, child: const Text('No'))
-                                            ],
-                                          );
-                                        });
-                                  },
+                                          fontSize: 13
+                                      ),) :
+                                    const Icon(Icons.stop, size: 20,)
+                                )
+                                    : Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: [
+                                    ElevatedButton(onPressed: () {
+                                      exchange = false;
+                                      timeClock.onStartTimer();
+                                      stop = true;
+                                    },
                                       style: ElevatedButton.styleFrom(
                                           shape: const CircleBorder(),
                                           fixedSize: const Size(80, 80),
                                           backgroundColor: Colors.deepOrange,
                                           shadowColor: Colors.lightBlueAccent
                                       ),
-                                      child: const Text('FINISH',
+                                      child: const Text('RESUME',
                                         style: TextStyle(
-                                            fontSize: 14
-                                        ),)),
-                                ],
+                                            fontSize: 12
+                                        ),),),
+                                    ElevatedButton(onPressed: () {
+                                      showDialog(context: context,
+                                          builder: (context) {
+                                            return AlertDialog(
+                                              title: const Text(
+                                                  'Do you wanna save this acitivity ?'),
+                                              actions: [
+                                                TextButton(onPressed: () async {
+                                                  List<GeoPoint> path = [];
+                                                  for (LatLng latlng in points) {
+                                                    path.add(GeoPoint(
+                                                        latlng.latitude,
+                                                        latlng.longitude));
+                                                  }
+                                                  final user = <String, dynamic>{
+                                                    'distance': dis,
+                                                    'speed': (double.parse(
+                                                        dis) /
+                                                        ((double.parse(value
+                                                            .toString())) /
+                                                            (1000 * 3600)))
+                                                        .toStringAsFixed(2),
+                                                    'time': displayTime.substring(
+                                                        0, 8),
+                                                    'path': path,
+                                                    'timeISO': timeIso
+                                                  };
+                                                  if (timeIso.isNotEmpty) {
+                                                    await _db.collection(
+                                                        'information').add(user);
+                                                  }
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context, user);
+                                                }, child: const Text('Yes')),
+                                                TextButton(onPressed: () {
+                                                  Navigator.pop(context);
+                                                  List<String> list = ['unvalid'];
+                                                  List<GeoPoint> path = [
+                                                    const GeoPoint(0, 0)
+                                                  ];
+                                                  final user = <String, dynamic>{
+                                                    'distance': 'unvalid',
+                                                    'speed': 'unvalid',
+                                                    'path': path,
+                                                    'timeISO': list
+                                                  };
+                                                  ScaffoldMessenger.of(context)
+                                                      .showSnackBar(
+                                                      const SnackBar(
+                                                          content: Text(
+                                                            'UnSaved',
+                                                            style: TextStyle(
+                                                              fontSize: 20,
+                                                              fontWeight: FontWeight
+                                                                  .bold,
+                                                              color: Colors.red,
+                                                            ),
+                                                          )));
+                                                  Navigator.pop(context, user);
+                                                }, child: const Text('No'))
+                                              ],
+                                            );
+                                          });
+                                    },
+                                        style: ElevatedButton.styleFrom(
+                                            shape: const CircleBorder(),
+                                            fixedSize: const Size(80, 80),
+                                            backgroundColor: Colors.deepOrange,
+                                            shadowColor: Colors.lightBlueAccent
+                                        ),
+                                        child: const Text('FINISH',
+                                          style: TextStyle(
+                                              fontSize: 14
+                                          ),)),
+                                  ],
+                                ),
                               ),
-                              ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.green,
-                                      fixedSize: Size(60, 60),
-                                      shape: CircleBorder()
-                                  ),
-                                  onPressed: () async {
-                                    Widget weather = await weatherAPI(
-                                        currentLocation);
-                                    showModalBottomSheet(
-                                        context: context,
-                                        builder: (context) {
-                                          return Scaffold(
-                                            backgroundColor: Colors.lightGreen,
-                                            body: weather,
-                                          );
-                                        });
-                                  },
-                                  child: const Icon(
-                                    weather.cloud_sun_inv, size: 40,))
+                              Expanded(
+                                flex: 1,
+                                child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.green,
+                                        fixedSize: Size(60, 60),
+                                        shape: CircleBorder()
+                                    ),
+                                    onPressed: () async {
+                                      Widget weather = await weatherAPI(
+                                          currentLocation);
+                                      showModalBottomSheet(
+                                          context: context,
+                                          builder: (context) {
+                                            return Scaffold(
+                                              backgroundColor: Colors.lightGreen,
+                                              body: weather,
+                                            );
+                                          });
+                                    },
+                                    child: const Icon(
+                                      weather.cloud_sun_inv, size: 40,)
+                                ),
+                              )
                             ],
                           )
-                      )
+
                     ],
                   ),
                 );

@@ -1,7 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'dart:async';
-// import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:flutter/material.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart' ;
 
@@ -55,7 +54,7 @@ Future<Widget> weatherAPI(LatLng? address) async{
 
                           Row(
                             children: [
-                              Icon(Icons.water_drop),
+                              const Icon(Icons.water_drop),
                               Text(
                                   '${timeOfDay[index]['chance_of_rain']} %',
                                   style: const TextStyle(
@@ -96,7 +95,7 @@ Future<Widget> weatherAPI(LatLng? address) async{
                                     ]
                                   ),
                               ),
-                              Divider(),
+                              const Divider(),
                               RichText(
                                 text: TextSpan(
                                     text: 'Wind :',
@@ -113,7 +112,7 @@ Future<Widget> weatherAPI(LatLng? address) async{
                                     ]
                                 ),
                               ),
-                              Divider(),
+                              const Divider(),
                               RichText(
                                 text: TextSpan(
                                     text: 'Humidity :',
@@ -150,7 +149,7 @@ Future<Widget> weatherAPI(LatLng? address) async{
                                     ]
                                 ),
                               ),
-                              Divider(),
+                              const Divider(),
                               RichText(
                                 text: TextSpan(
                                     text: 'UV Max : ',
@@ -167,7 +166,7 @@ Future<Widget> weatherAPI(LatLng? address) async{
                                     ]
                                 ),
                               ),
-                              Divider(),
+                              const Divider(),
                               RichText(
                                 text: TextSpan(
                                     text: 'Wind Degree : ',
@@ -195,12 +194,8 @@ Future<Widget> weatherAPI(LatLng? address) async{
               },
              childCount: timeOfDay.length,
           ),
-
       )
-
     ],
   );
-
-
 }
 

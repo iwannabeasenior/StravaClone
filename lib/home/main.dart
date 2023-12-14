@@ -3,12 +3,13 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:stravaclone/map/vietmap.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart' ;
 import 'package:stravaclone/map/strava_api.dart';
 import 'package:stravaclone/home/profile/profile_main.dart';
-import 'map/generate_gpx_file.dart';
-import 'home/firebase_options.dart';
+import '../map/generate_gpx_file.dart';
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -258,22 +259,24 @@ class _HomeState extends State<Home> {
                                         controller = controllerMap;
                                         setState(() {});
                                       },
-                                    onMapRenderedCallback: () async {
-                                        // controller work properly only if Map is rendered fullly
-                                        await controller.addPolyline(
-                                          PolylineOptions(
-                                            polylineWidth: 14,
-                                            polylineOpacity: 1,
-                                            draggable: true,
-                                            geometry: list,
-                                            polylineColor: Colors.red,
-                                          ));
-                                        setState(() {});
-                                        // dispose after draw polyline
-                                        controller.dispose();
-                                    },
+                                      onMapRenderedCallback: () async {
+                                          // controller work properly only if Map is rendered fullly
+                                          await controller.addPolyline(
+                                            PolylineOptions(
+                                              polylineWidth: 14,
+                                              polylineOpacity: 1,
+                                              draggable: true,
+                                              geometry: list,
+                                              polylineColor: Colors.red,
+                                            ));
+                                          setState(() {});
+                                          // dispose after draw polyline
+                                          controller.dispose();
+                                      },
                                   );
-                                }));
+                                }
+                                )
+                            );
                           },
                           child: const Image(image : AssetImage('asset/image/map.png'),
                           ),
@@ -301,7 +304,7 @@ class _HomeState extends State<Home> {
                               )),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   );
