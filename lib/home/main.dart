@@ -3,7 +3,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:spotify_sdk/spotify_sdk.dart';
 import 'package:stravaclone/map/vietmap.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart' ;
 import 'package:stravaclone/map/strava_api.dart';
@@ -101,6 +100,7 @@ class _HomeState extends State<Home> {
                         ),
                       ),
                       body : CustomScrollView(
+                          physics: const ClampingScrollPhysics(),
                           slivers: <Widget> [
                             SliverList (
                               delegate: SliverChildBuilderDelegate((context, index) =>  Card(child : Container(
@@ -156,7 +156,9 @@ class _HomeState extends State<Home> {
                                         }));
                                   },
                                 ),
-                              ),),
+                              ),
+
+                              ),
                                   childCount: run.length),
                             ),
                           ],
@@ -210,12 +212,13 @@ class _HomeState extends State<Home> {
         color: Colors.amber,)
       ),
       body : CustomScrollView(
+        physics: ClampingScrollPhysics(),
         slivers: <Widget>[
           SliverList(
             delegate: SliverChildBuilderDelegate(
                 (BuildContext context, int index)  {
                   return Card(
-                    shape: const CircleBorder(),
+                    shape: OutlineInputBorder(borderSide: BorderSide(color: Colors.deepPurpleAccent, width: 5)),
                     margin: EdgeInsets.all(20),
                     child: Column(
                       children: [
@@ -248,41 +251,47 @@ class _HomeState extends State<Home> {
                                     list.add(LatLng(coordinate.latitude, coordinate.longitude));
                                   }
                                   late VietmapController controller;
-                                  return VietmapGL(
-                                      zoomGesturesEnabled: true,
-                                      initialCameraPosition: CameraPosition(
-                                        target: list.isEmpty ? const LatLng(0, 0) : LatLng(list[0].latitude, list[0].longitude),
-                                        zoom: 18
-                                      ),
-                                      styleString: 'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
-                                      onMapCreated: (VietmapController controllerMap) async {
-                                        controller = controllerMap;
-                                        setState(() {});
-                                      },
-                                      onMapRenderedCallback: () async {
-                                          // controller work properly only if Map is rendered fullly
-                                          await controller.addPolyline(
-                                            PolylineOptions(
-                                              polylineWidth: 14,
-                                              polylineOpacity: 1,
-                                              draggable: true,
-                                              geometry: list,
-                                              polylineColor: Colors.red,
-                                            ));
+                                  return Hero(
+                                    tag: index,
+                                    child: VietmapGL(
+                                        zoomGesturesEnabled: true,
+                                        initialCameraPosition: CameraPosition(
+                                          target: list.isEmpty ? const LatLng(0, 0) : LatLng(list[0].latitude, list[0].longitude),
+                                          zoom: 18
+                                        ),
+                                        styleString: 'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
+                                        onMapCreated: (VietmapController controllerMap) async {
+                                          controller = controllerMap;
                                           setState(() {});
-                                          // dispose after draw polyline
-                                          controller.dispose();
-                                      },
+                                        },
+                                        onMapRenderedCallback: () async {
+                                            // controller work properly only if Map is rendered fullly
+                                            await controller.addPolyline(
+                                              PolylineOptions(
+                                                polylineWidth: 7,
+                                                polylineOpacity: 1,
+                                                draggable: true,
+                                                geometry: list,
+                                                polylineColor: Colors.red,
+                                              ));
+                                            setState(() {});
+                                            // dispose after draw polyline
+                                            controller.dispose();
+                                        },
+                                    ),
                                   );
                                 }
                                 )
                             );
                           },
-                          child: const Image(image : AssetImage('asset/image/map.png'),
+                          child: Hero(
+                            tag: index,
+                            child: const Image(image : AssetImage('asset/image/map.png'),
+                            ),
                           ),
                         ),
                         Container(
-                          color: Colors.pink,
+                          color: Colors.grey,
                           height: 70,
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,

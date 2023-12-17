@@ -24,6 +24,7 @@ Future<Widget> weatherAPI(LatLng? address) async{
   }
 
   return CustomScrollView(
+    physics: const BouncingScrollPhysics(),
     slivers: <Widget>[
       SliverList(
           delegate: SliverChildBuilderDelegate(

@@ -114,8 +114,6 @@ class _HomeState extends State<SpotifyAPI> {
           var playerState = snapshot.data;
           // not waitting , tra ve 1 danh sach bai hat ma tau yeu thich roi tu pick bai dau tien, xep tat ca vao 1 albulm
           if (playerState == null || track == null) {
-            // SpotifySdk.play(spotifyUri: "spotify:track:6epn3r7S14KUqlReYr77hA");
-
             return  Center(
               child:  Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
@@ -243,9 +241,7 @@ class _HomeState extends State<SpotifyAPI> {
                                 ))
                         )
                     );
-                    setState(() {
-
-                    });
+                    setState(() {});
                   } else {
                     await SpotifySdk.addToLibrary(spotifyUri: uri);
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -257,9 +253,7 @@ class _HomeState extends State<SpotifyAPI> {
                                 ))
                         )
                     );
-                    setState(() {
-
-                    });
+                    setState(() {});
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -307,6 +301,10 @@ class _HomeState extends State<SpotifyAPI> {
           }
         });
   }
+
+
+
+
   Future<void> getAlbum() async {
     print('accessToken is $accessToken}');
     final uri = Uri.https('api.spotify.com', '/v1/me/top/tracks');

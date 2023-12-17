@@ -19,16 +19,16 @@ class MyMap extends StatefulWidget {
 
 class _MyMapState extends State<MyMap> {
   late VietmapController controller;
-  bool setZoom = false;
-  bool isMapOpen = false;
+  bool setZoom = false; // set zoom = 18 when map is created
+  bool isMapOpen = false;  // delay 3 second
   bool granted = false;
-  double distance  = 0;
+  double distance  = 0; // calculate distance
   final timeClock = StopWatchTimer();
   String dis = '0.00';
-  bool start = false;
-  bool exchange = false;
+  bool start = false; // or not user start running
+  bool exchange = false; // change from stop to resume/end and reverse
   bool stop = false;
-  double zoom = 20;
+  double zoom = 20; // save zoom of camera of map
   final List<LatLng> points = [];
   final List<String> timeIso = [];
   final List<String> times = [];
@@ -39,9 +39,12 @@ class _MyMapState extends State<MyMap> {
   void initState() {
     checkPermision();
     super.initState();
-    Future.delayed(const Duration(seconds: 3)).then((value) {
-      setState(() {isMapOpen = true;});
+    setState(() {
+
     });
+    // Future.delayed(const Duration(seconds: 3)).then((value) {
+    //   setState(() {isMapOpen = true;});
+    // });
   }
 
   @override
@@ -49,6 +52,7 @@ class _MyMapState extends State<MyMap> {
     controller.dispose();
     super.dispose();
   }
+  // calculate distance
   double calculateDistance(LatLng point1, LatLng point2) {
     const double earthRadius = 6371.0; // Radius of the Earth in kilometers
 
@@ -76,14 +80,17 @@ class _MyMapState extends State<MyMap> {
 
   @override
   Widget build(BuildContext context) {
+
     return !isMapOpen ? const Scaffold(body : Center(child: CircularProgressIndicator())) :
      SafeArea(child: Scaffold(
         appBar: AppBar(
           title: const Center(child: Text('Run')),
           backgroundColor: Colors.deepOrange,
           actions: [
-            IconButton(onPressed: () {},
-                icon: const Icon(Icons.settings))
+            IconButton(
+                onPressed: () {},
+                icon: const Icon(Icons.settings)
+            )
           ],
         ),
         body: Stack(
@@ -103,8 +110,8 @@ class _MyMapState extends State<MyMap> {
                   zoom = 18;
                   setZoom = true;
                 } // set first zoom of camera = 18
-                await controller.animateCamera(CameraUpdate.newCameraPosition(
-                    CameraPosition(target: location.position, zoom: zoom)));
+                // await controller.animateCamera(CameraUpdate.newCameraPosition(
+                //     CameraPosition(target: location.position, zoom: zoom)));
                 if (stop) {
                   points.add(location.position);
                   timeIso.add(
@@ -113,7 +120,12 @@ class _MyMapState extends State<MyMap> {
                   int len = points.length;
 
                   if (len >= 2) {
-                    distance += calculateDistance(points[len-2], points[len-1]);
+                    var distanceTwoPoint = calculateDistance(points[len-2], points[len-1]);
+                    if (distanceTwoPoint > 1) {
+                      await controller.animateCamera(CameraUpdate.newCameraPosition(
+                          CameraPosition(target: location.position, zoom: zoom)));
+                    }
+                    distance += distanceTwoPoint;
                   }
                   dis = distance.toStringAsFixed(2);
                   // calculate distance
@@ -121,7 +133,7 @@ class _MyMapState extends State<MyMap> {
                       PolylineOptions(
                           geometry: points,
                           polylineColor: Colors.red,
-                          polylineWidth: 14,
+                          polylineWidth: 8,
                           polylineOpacity: 0.5,
                           draggable: true
                       )
@@ -129,6 +141,7 @@ class _MyMapState extends State<MyMap> {
                   setState(() {});
                 }
               },
+
               myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
               myLocationRenderMode: MyLocationRenderMode.COMPASS,
               zoomGesturesEnabled: true,
@@ -230,125 +243,140 @@ class _MyMapState extends State<MyMap> {
 
                               Expanded(
                                 flex: 2,
-                                child: !exchange ? ElevatedButton(onPressed: () async {
-                                  if (!start) {
-                                    timeClock.onStartTimer();
-                                    setState(() {
-                                      start = true;
-                                      stop = true;
-                                    });
-                                  } else {
-                                    timeClock.onStopTimer();
-                                    exchange = true;
-                                    stop = false;
-                                    setState(() {});
-                                  }
-                                },
-                                    style: ElevatedButton.styleFrom(
-                                        shape: const CircleBorder(),
-                                        fixedSize: const Size(80, 80),
-                                        backgroundColor: Colors.deepOrange,
-                                        shadowColor: Colors.lightBlueAccent
-                                    )
-                                    , child: !start ? const Text('START',
-                                      style: TextStyle(
-                                          fontSize: 13
-                                      ),) :
-                                    const Icon(Icons.stop, size: 20,)
-                                )
-                                    : Row(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                  children: [
-                                    ElevatedButton(onPressed: () {
-                                      exchange = false;
+                                child: AnimatedSwitcher(
+                                  transitionBuilder: (child, animation) {
+                                    return SlideTransition(
+                                        position: Tween<Offset>(
+                                          begin: const Offset(1.0, 0.0),
+                                          end: Offset.zero,
+                                        ).animate(animation),
+                                        child: child,
+                                    );
+                                  },
+                                  duration: const Duration(milliseconds: 300),
+                                  child: !exchange ? ElevatedButton(onPressed: () async {
+                                    if (!start) {
                                       timeClock.onStartTimer();
-                                      stop = true;
-                                    },
+                                      setState(() {
+                                        start = true;
+                                        stop = true;
+                                      });
+                                    } else {
+                                      timeClock.onStopTimer();
+                                      exchange = true;
+                                      stop = false;
+                                      setState(() {});
+                                    }
+                                  },
                                       style: ElevatedButton.styleFrom(
                                           shape: const CircleBorder(),
                                           fixedSize: const Size(80, 80),
                                           backgroundColor: Colors.deepOrange,
                                           shadowColor: Colors.lightBlueAccent
-                                      ),
-                                      child: const Text('RESUME',
+                                      )
+                                      , child: !start ? const Text('START',
                                         style: TextStyle(
-                                            fontSize: 12
-                                        ),),),
-                                    ElevatedButton(onPressed: () {
-                                      showDialog(context: context,
-                                          builder: (context) {
-                                            return AlertDialog(
-                                              title: const Text(
-                                                  'Do you wanna save this acitivity ?'),
-                                              actions: [
-                                                TextButton(onPressed: () async {
-                                                  List<GeoPoint> path = [];
-                                                  for (LatLng latlng in points) {
-                                                    path.add(GeoPoint(
-                                                        latlng.latitude,
-                                                        latlng.longitude));
-                                                  }
-                                                  final user = <String, dynamic>{
-                                                    'distance': dis,
-                                                    'speed': (double.parse(
-                                                        dis) /
-                                                        ((double.parse(value
-                                                            .toString())) /
-                                                            (1000 * 3600)))
-                                                        .toStringAsFixed(2),
-                                                    'time': displayTime.substring(
-                                                        0, 8),
-                                                    'path': path,
-                                                    'timeISO': timeIso
-                                                  };
-                                                  if (timeIso.isNotEmpty) {
-                                                    await _db.collection(
-                                                        'information').add(user);
-                                                  }
-                                                  Navigator.pop(context);
-                                                  Navigator.pop(context, user);
-                                                }, child: const Text('Yes')),
-                                                TextButton(onPressed: () {
-                                                  Navigator.pop(context);
-                                                  List<String> list = ['unvalid'];
-                                                  List<GeoPoint> path = [
-                                                    const GeoPoint(0, 0)
-                                                  ];
-                                                  final user = <String, dynamic>{
-                                                    'distance': 'unvalid',
-                                                    'speed': 'unvalid',
-                                                    'path': path,
-                                                    'timeISO': list
-                                                  };
-                                                  ScaffoldMessenger.of(context)
-                                                      .showSnackBar(
-                                                      const SnackBar(
-                                                          content: Text(
-                                                            'UnSaved',
-                                                            style: TextStyle(
-                                                              fontSize: 20,
-                                                              fontWeight: FontWeight
-                                                                  .bold,
-                                                              color: Colors.red,
-                                                            ),
-                                                          )));
-                                                  Navigator.pop(context, user);
-                                                }, child: const Text('No'))
-                                              ],
-                                            );
-                                          });
-                                    },
+                                            fontWeight: FontWeight.bold,
+                                            fontSize: 13
+                                        ),) :
+                                      const Icon(Icons.stop, size: 40,)
+                                  )
+                                      : Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                    children: [
+                                      ElevatedButton(onPressed: () {
+                                        exchange = false;
+                                        timeClock.onStartTimer();
+                                        stop = true;
+                                      },
                                         style: ElevatedButton.styleFrom(
                                             shape: const CircleBorder(),
                                             fixedSize: const Size(80, 80),
                                             backgroundColor: Colors.deepOrange,
                                             shadowColor: Colors.lightBlueAccent
                                         ),
-                                        child: const Text('FINISH',
+                                        child: const Text('RESUME',
                                           style: TextStyle(
-                                              fontSize: 14
-                                          ),)),
-                                  ],
+                                              fontWeight: FontWeight.bold,
+                                              fontSize: 12
+                                          ),),),
+                                      ElevatedButton(onPressed: () {
+                                        showDialog(context: context,
+                                            builder: (context) {
+                                              return AlertDialog(
+                                                title: const Text(
+                                                    'Do you wanna save this acitivity ?'),
+                                                actions: [
+                                                  TextButton(onPressed: () async {
+                                                    List<GeoPoint> path = [];
+                                                    for (LatLng latlng in points) {
+                                                      path.add(GeoPoint(
+                                                          latlng.latitude,
+                                                          latlng.longitude));
+                                                    }
+                                                    final user = <String, dynamic>{
+                                                      'distance': dis,
+                                                      'speed': (double.parse(
+                                                          dis) /
+                                                          ((double.parse(value
+                                                              .toString())) /
+                                                              (1000 * 3600)))
+                                                          .toStringAsFixed(2),
+                                                      'time': displayTime.substring(
+                                                          0, 8),
+                                                      'path': path,
+                                                      'timeISO': timeIso
+                                                    };
+                                                    if (timeIso.isNotEmpty) {
+                                                      await _db.collection(
+                                                          'information').add(user);
+                                                    }
+                                                    Navigator.pop(context);
+                                                    Navigator.pop(context, user);
+                                                  }, child: const Text('Yes')),
+                                                  TextButton(onPressed: () {
+                                                    Navigator.pop(context);
+                                                    List<String> list = ['unvalid'];
+                                                    List<GeoPoint> path = [
+                                                      const GeoPoint(0, 0)
+                                                    ];
+                                                    final user = <String, dynamic>{
+                                                      'distance': 'unvalid',
+                                                      'speed': 'unvalid',
+                                                      'path': path,
+                                                      'timeISO': list
+                                                    };
+                                                    ScaffoldMessenger.of(context)
+                                                        .showSnackBar(
+                                                        const SnackBar(
+                                                            content: Text(
+                                                              'UnSaved',
+                                                              style: TextStyle(
+                                                                fontSize: 20,
+                                                                fontWeight: FontWeight
+                                                                    .bold,
+                                                                color: Colors.red,
+                                                              ),
+                                                            )));
+                                                    Navigator.pop(context, user);
+                                                  }, child: const Text('No'))
+                                                ],
+                                              );
+                                            });
+                                      },
+                                          style: ElevatedButton.styleFrom(
+                                              shape: const CircleBorder(),
+                                              fixedSize: const Size(80, 80),
+                                              backgroundColor: Colors.deepOrange,
+                                              shadowColor: Colors.lightBlueAccent
+                                          ),
+                                          child: const Text('FINISH',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold,
+                                                fontSize: 14
+                                            ),)),
+                                    ],
+                                  ),
                                 ),
                               ),
                               Expanded(
@@ -377,7 +405,6 @@ class _MyMapState extends State<MyMap> {
                               )
                             ],
                           )
-
                     ],
                   ),
                 );
@@ -393,7 +420,7 @@ class _MyMapState extends State<MyMap> {
     PermissionStatus permissionStatus;
     LocationData locationData;
     serviceEnabled = await location.serviceEnabled();
-    if (serviceEnabled) {
+    if (!serviceEnabled) {
       serviceEnabled = await location.requestService();
       if (!serviceEnabled) {
         return;
@@ -406,12 +433,15 @@ class _MyMapState extends State<MyMap> {
         return;
       }
     }
+
     locationData = await location.getLocation().then(
             (value) {
           currentLocation = LatLng(value.latitude!, value.longitude!);
-          setState(() {});
           return value;
         }
     );
+    setState(() {
+      isMapOpen = true;
+    });
   }
 }
