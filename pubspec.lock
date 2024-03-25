@@ -106,15 +106,15 @@ packages:
     source: hosted
     version: "1.0.6"
   dio:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: dio
-      sha256: "417e2a6f9d83ab396ec38ff4ea5da6c254da71e4db765ad737a42af6930140b7"
+      sha256: "49af28382aefc53562459104f64d16b9dfd1e8ef68c862d5af436cc8356ce5a8"
       url: "https://pub.dev"
     source: hosted
-    version: "5.3.3"
+    version: "5.4.1"
   equatable:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: equatable
       sha256: c2b87cb7756efdf69892005af546c56c0b5037f54d2a88269b4f347a505e3ca2
@@ -206,6 +206,22 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_appauth:
+    dependency: "direct main"
+    description:
+      name: flutter_appauth
+      sha256: "6aca161b2a1758478a13f758897fc98688277951dafb4b7e62729c1dfbcefdaa"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.5"
+  flutter_appauth_platform_interface:
+    dependency: transitive
+    description:
+      name: flutter_appauth_platform_interface
+      sha256: "44feaa7058191b5d3cd7c9ff195262725773643121bcada172d49c2ddcff71cb"
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.0.0"
   flutter_dotenv:
     dependency: "direct main"
     description:
@@ -252,7 +268,7 @@ packages:
     source: sdk
     version: "0.0.0"
   flutter_web_auth:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: flutter_web_auth
       sha256: a69fa8f43b9e4d86ac72176bf747b735e7b977dd7cf215076d95b87cb05affdd
@@ -263,18 +279,18 @@ packages:
     dependency: "direct main"
     description:
       name: flutter_web_auth_2
-      sha256: "75613aa4d8e43df3de0fc3d93df36ae5b4ba2e94070384c5a9baeda99f5a235f"
+      sha256: "3ea3a0cc539ca74319f4f2f7484f62742fe5b2ff9a0fca37575426d6e6f07901"
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.3"
+    version: "3.1.1"
   flutter_web_auth_2_platform_interface:
     dependency: transitive
     description:
       name: flutter_web_auth_2_platform_interface
-      sha256: "9124824cbd21e12680bf58190e27b77f251c897e80ec81cd557ec1fde9aecabf"
+      sha256: e8669e262005a8354389ba2971f0fc1c36188481234ff50d013aaf993f30f739
       url: "https://pub.dev"
     source: hosted
-    version: "3.0.0"
+    version: "3.1.0"
   flutter_web_plugins:
     dependency: transitive
     description: flutter
@@ -464,6 +480,22 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.9.1"
+  nested:
+    dependency: transitive
+    description:
+      name: nested
+      sha256: "03bac4c528c64c95c722ec99280375a6f2fc708eec17c7b3f07253b626cd2a20"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
+  page_transition:
+    dependency: "direct main"
+    description:
+      name: page_transition
+      sha256: dee976b1f23de9bbef5cd512fe567e9f6278caee11f5eaca9a2115c19dc49ef6
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   path:
     dependency: transitive
     description:
@@ -584,6 +616,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.6"
+  provider:
+    dependency: "direct main"
+    description:
+      name: provider
+      sha256: c8a055ee5ce3fd98d6fc872478b03823ffdb448699c6ebdbbc71d59b596fd48c
+      url: "https://pub.dev"
+    source: hosted
+    version: "6.1.2"
   rxdart:
     dependency: transitive
     description:
@@ -600,6 +640,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.1.0"
+  screenshot:
+    dependency: "direct main"
+    description:
+      name: screenshot
+      sha256: "455284ff1f5b911d94a43c25e1385485cf6b4f288293eba68f15dad711c7b81c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   settings_ui:
     dependency: "direct main"
     description:
@@ -609,7 +657,7 @@ packages:
     source: hosted
     version: "2.0.2"
   shared_preferences:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: shared_preferences
       sha256: "81429e4481e1ccfb51ede496e916348668fd0921627779233bd24cc3ff6abd02"
@@ -869,14 +917,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.2.6"
-  vietmap_flutter_navigation:
-    dependency: "direct main"
-    description:
-      name: vietmap_flutter_navigation
-      sha256: b17edb0a3a37191aa5156b99231ebf273ea8501bec6eb8277a11c2d2fd319ce5
-      url: "https://pub.dev"
-    source: hosted
-    version: "1.4.0"
   vietmap_gl_platform_interface:
     dependency: transitive
     description:

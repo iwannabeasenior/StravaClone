@@ -60,8 +60,15 @@ dependencies:
   flutter_dotenv: ^5.1.0
   logger: ^2.0.2+1
   vietmap_flutter_gl: ^1.2.6
-  vietmap_flutter_navigation: ^1.4.0
   firebase_storage: ^11.5.5
+  screenshot: ^2.1.0
+  equatable: ^2.0.5
+  provider: ^6.1.2
+  shared_preferences: ^2.2.2
+  dio: ^5.4.1
+  flutter_web_auth: ^0.5.0
+  flutter_appauth: ^6.0.5
+  page_transition: ^2.1.0
 
 dev_dependencies:
   flutter_test:
@@ -85,8 +92,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
-    - asset/image/map.png
-    - asset/image/profile.png
+    - asset/image/
     - .env
   fonts:
     - family: Spotify
@@ -98,6 +104,13 @@ flutter:
     - family: weather
       fonts:
         - asset: asset/font/weather.ttf
+    - family: Post
+      fonts:
+        - asset: asset/font/Post.ttf
+    - family: Location
+      fonts:
+        - asset: asset/font/Location.ttf
+
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg

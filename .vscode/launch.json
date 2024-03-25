@@ -1,24 +1,37 @@
 {
-  "version": "0.2.0",
-  "configurations": [
-    {
-      "name": "C/C++ Runner: Debug Session",
-      "type": "cppdbg",
-      "request": "launch",
-      "args": [],
-      "stopAtEntry": false,
-      "externalConsole": true,
-      "cwd": "c:/Users/NguyenTrungThanh/AndroidStudioProjects/stravaclone/windows/flutter",
-      "program": "c:/Users/NguyenTrungThanh/AndroidStudioProjects/stravaclone/windows/flutter/build/Debug/outDebug",
-      "MIMode": "gdb",
-      "miDebuggerPath": "gdb",
-      "setupCommands": [
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
         {
-          "description": "Enable pretty-printing for gdb",
-          "text": "-enable-pretty-printing",
-          "ignoreFailures": true
+            "name": "Stravaclone - Copy",
+            "request": "launch",
+            "type": "dart"
+        },
+        {
+            "name": "Stravaclone - Copy (profile mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "profile"
+        },
+        {
+            "name": "Stravaclone - Copy (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "release"
+        },
+        {
+            "name": "Stravaclone - Copy (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "flutterMode": "debug"
+        },
+        {
+            "name": "Stravaclone - Copy (release mode)",
+            "request": "launch",
+            "type": "dart",
+            "program": "lib/home/main.dart",
         }
-      ]
-    }
-  ]
+    ]
 }
