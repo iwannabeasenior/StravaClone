@@ -27,9 +27,6 @@ class _ChartState extends State<Chart> {
                             getTitlesWidget: getTitles,
                           )
                         ),
-                        // leftTitles: AxisTitles(
-                        //   sideTitles: SideTitles(showTitles: true),
-                        // ),
                         rightTitles: const AxisTitles(
                           sideTitles: SideTitles(showTitles: false),
                         ),

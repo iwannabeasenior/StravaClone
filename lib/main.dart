@@ -10,10 +10,9 @@ import 'package:stravaclone/features/data/repositories/weather_repository_impl.d
 import 'package:stravaclone/features/data/source/local/local_storage_posts.dart';
 import 'package:stravaclone/features/data/source/network/spotify_api.dart';
 import 'package:stravaclone/features/data/source/network/weather_api.dart';
-import 'package:stravaclone/features/domain/usecase/get_list_posts.dart';
-import 'package:stravaclone/features/domain/usecase/get_top_50_tracks.dart';
-import 'package:stravaclone/features/domain/usecase/get_weather_today.dart';
-import 'package:stravaclone/features/domain/usecase/get_work_out_album.dart';
+import 'package:stravaclone/features/domain/usecase/get_data_post.dart';
+import 'package:stravaclone/features/domain/usecase/get_data_spotify.dart';
+import 'package:stravaclone/features/domain/usecase/get_data_weather.dart';
 import 'package:stravaclone/features/presentation/pages/home/home.dart';
 
 import '/features/presentation/support/firebase_options.dart';
@@ -41,40 +40,26 @@ void main() async {
   );
   createSaveFile();
 
-  LocalStorageImpl localStorageImpl = LocalStorageImpl();
-  PostRepositoryImpl postRepositoryImpl =
-      PostRepositoryImpl(localStorage: localStorageImpl);
-  GetListPosts getListPosts = GetListPosts(repository: postRepositoryImpl);
+  // post
+  GetDataPost getDataPost = GetDataPost(repository: PostRepositoryImpl(localStorage: LocalStorageImpl()));
 
-  SpotifyAPIDataImpl spotifyAPIDataImpl = SpotifyAPIDataImpl();
-  TrackRepositoryImpl trackRepositoryImpl =
-      TrackRepositoryImpl(api: spotifyAPIDataImpl);
-  GetTop50Tracks getTop50Tracks =
-      GetTop50Tracks(repository: trackRepositoryImpl);
-  GetWorkOutAlbum getWorkOutAlbum = GetWorkOutAlbum(repository: trackRepositoryImpl);
+  //spotify
+  GetDataSpotify getDataSpotify = GetDataSpotify(repository: TrackRepositoryImpl(api: SpotifyAPIDataImpl()));
 
-  WeatherAPIImpl weatherAPIImpl = WeatherAPIImpl();
-  WeatherRepositoryImpl weatherRepositoryImpl =
-      WeatherRepositoryImpl(api: weatherAPIImpl);
-  GetWeatherToday getWeatherToday = GetWeatherToday(repository: weatherRepositoryImpl);
+  //weather
+  GetDataWeather getDataWeather = GetDataWeather(repository: WeatherRepositoryImpl(api: WeatherAPIImpl()));
 
   runApp(MultiProvider(
     providers: [
       Provider.value(
-        value: getListPosts,
+        value: getDataWeather,
       ),
       Provider.value(
-        value: localStorageImpl,
+        value: getDataSpotify,
       ),
       Provider.value(
-        value: getTop50Tracks,
+        value: getDataPost
       ),
-      Provider.value(
-        value: getWorkOutAlbum
-      ),
-      Provider.value(
-        value: getWeatherToday
-      )
     ],
     child: const MaterialApp(
       debugShowCheckedModeBanner: false,

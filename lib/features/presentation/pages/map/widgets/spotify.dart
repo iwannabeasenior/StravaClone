@@ -1,10 +1,14 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:spotify_sdk/models/image_uri.dart';
+import 'package:spotify_sdk/models/player_options.dart';
+import 'package:spotify_sdk/models/player_restrictions.dart';
 import 'package:spotify_sdk/models/player_state.dart';
 import 'package:spotify_sdk/spotify_sdk.dart';
-import '../../../../../core/font/heart.dart';
+import '../../../../../helper/font/heart.dart';
 import '../../../../domain/entity/track.dart';
-
+import 'package:spotify_sdk/enums/repeat_mode_enum.dart' as repeat;
+import 'package:spotify_sdk/models/player_options.dart' as repeat2;
 class SpotifyAPI extends StatefulWidget {
   final List<Track> tracks50;
   final List<Track> albumWorkOut;
@@ -38,11 +42,12 @@ class _HomeState extends State<SpotifyAPI> {
 
   Widget spotifyView() {
     if (spotifyActivated) {
-      return connected();
+      return inConnect();
     } else {
       SpotifySdk.connectToSpotifyRemote(
           clientId: '47ddd41f0b974c40892de24a73dac073',
-          redirectUrl: 'stravaflutter://redirect');
+          redirectUrl: 'stravaflutter://redirect'
+      );
       return isConnecting();
     }
   }
@@ -55,7 +60,12 @@ class _HomeState extends State<SpotifyAPI> {
           await SpotifySdk.getAccessToken(
               clientId: '47ddd41f0b974c40892de24a73dac073',
               redirectUrl: 'stravaflutter://redirect',
-              scope: 'user-library-modify user-library-read user-read-email user-read-private playlist-modify-public user-top-read');
+              scope: 'user-library-modify user-library-read user-read-email user-read-private playlist-modify-public user-top-read'
+          );
+          SpotifySdk.connectToSpotifyRemote(
+              clientId: '47ddd41f0b974c40892de24a73dac073',
+              redirectUrl: 'stravaflutter://redirect'
+          );
         },
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.green,
@@ -68,6 +78,246 @@ class _HomeState extends State<SpotifyAPI> {
           textAlign: TextAlign.center,
         )),
       ),
+    );
+  }
+
+  Widget inConnect() {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const SizedBox(height: 30,),
+        const Center(
+            child: Text('Spotify for Strava', style: TextStyle(
+              fontWeight: FontWeight.bold,
+              fontSize: 30,
+            ),)
+        ),
+        SizedBox(
+          height: 250,
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 500),
+            switchInCurve: Curves.decelerate,
+            transitionBuilder: (child, animation) {
+              return ScaleTransition(scale: animation, child: child,);
+            },
+            reverseDuration: const Duration(milliseconds: 500),
+            child: choice == 1 ? Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.deepOrange,
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          colors: [Colors.blue.withOpacity(0.3), Colors.blue.withOpacity(1)])
+                  ),
+                  height: 100,
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      IconButton(onPressed: () {
+                        setState(() {
+                          choice = 2;
+                        });
+                      }, icon: const Icon(Icons.play_arrow)),
+                      ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(5)),
+                        child: Image.asset('asset/image/top50.jpg'),
+                      ),
+                      const SizedBox(width: 30,),
+                      const Text('Top 50 songs', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),),
+                    ],
+                  ),
+                ),
+                Container(
+                  margin: const EdgeInsets.all(10),
+                  decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(10),
+                      color: Colors.deepOrange,
+                      gradient: LinearGradient(
+                          begin: Alignment.centerLeft,
+                          colors: [Colors.blue.withOpacity(0.3), Colors.blue.withOpacity(1)])
+                  ),
+                  height: 100,
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      IconButton(onPressed: ()  {
+                        setState(() {
+                          choice = 3;
+                        });
+                      }, icon: const Icon(Icons.play_arrow)),
+                      ClipRRect(
+                        borderRadius: const BorderRadius.all(Radius.circular(5)),
+                        child: Image.asset('asset/image/workout.jpeg'),
+                      ),
+                      const SizedBox(width: 30,),
+                      const Text('Top work out music', style: TextStyle(fontWeight: FontWeight.w400, fontSize: 20),),
+                    ],
+                  ),
+                )
+              ],
+            ) :
+            details(),
+          ),
+        ),
+
+        // controller
+        Align(
+          alignment: Alignment.bottomCenter,
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.blue.withOpacity(0.5),
+              boxShadow: const [BoxShadow(color: Colors.black)],
+            ),
+            height:130,
+            child: StreamProvider(
+              create: (_) => SpotifySdk.subscribePlayerState(),
+              // initialData: '1',
+              initialData: PlayerState(
+                null,
+                1,
+                2,
+                PlayerOptions(
+                  repeat2.RepeatMode.track,
+                  isShuffling: true,
+                ),
+                PlayerRestrictions(
+                  canRepeatContext: true,
+                  canRepeatTrack: true,
+                  canSeek: true,
+                  canSkipNext: true,
+                  canSkipPrevious: true,
+                  canToggleShuffle: true
+                ),
+                isPaused: false,
+              ),
+              child: Column(
+                children: [
+                  const SizedBox(height: 10,),
+                  Center(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Selector<PlayerState, Map<String, dynamic>?>(
+                          builder: (context, newValue, child) {
+                            if(newValue == null) return Container(
+                                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                                height: 100,
+                                width: 100,
+                                child: ClipRRect(
+                                    borderRadius: BorderRadius.circular(10),
+                                    child: Image.asset('asset/image/jb.jpg')
+                                )
+                            );
+                            return ImageFromUri(uri: ImageUri.fromJson(newValue));
+                          },
+                          selector: (context , value) => value.track?.imageUri.toJson(), // phải đưa về dạng json vì để imageuri thì khi mình thêm vào thư viện yêu thích thì nó vẫn tính là imageuri thay đổi
+                        ),
+                        const SizedBox(width: 20,),
+                        Consumer<PlayerState>(
+                          builder: (context, value, child) {
+                            if (value.track == null) {
+                              return Center(
+                                child: Column(
+                                  children: [
+                                    const Text(
+                                      'Waiting...',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 25,
+                                      ),
+                                    ),
+                                    IconButton(
+                                        onPressed: () {
+                                          SpotifySdk.play(
+                                              spotifyUri: "spotify:track:6epn3r7S14KUqlReYr77hA");
+                                        },
+                                        icon: const Icon(Icons.play_arrow))
+                                  ],
+                                ),
+                              );
+                            }
+                            return Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  child: Text(
+                                    value.track?.name ?? 'Unknown',
+                                    style: const TextStyle(
+                                        fontWeight: FontWeight.bold, fontSize: 15, color: Colors.white), overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(height: 5,),
+                                Container(child: Text(value.track?.artist.name ?? 'Unknown', style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w500, color: Colors.white, overflow: TextOverflow.ellipsis),)),
+                                const SizedBox(height: 10,),
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                  children: [
+                                    ElevatedButton(
+                                        onPressed: () async {
+                                          await SpotifySdk.setRepeatMode(
+                                              repeatMode: repeat.RepeatMode.track);
+                                          await SpotifySdk.toggleRepeat();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          fixedSize: const Size(50, 50),
+                                          backgroundColor: Colors.green,
+                                          shape: const CircleBorder(),
+                                        ),
+                                        child: const Icon(Icons.repeat)),
+                                    value.isPaused
+                                        ? ElevatedButton(
+                                        onPressed: () async {
+                                          await SpotifySdk.resume();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          fixedSize: const Size(50, 50),
+                                          backgroundColor: Colors.green,
+                                          shape: const CircleBorder(),
+                                        ),
+                                        child: const Icon(Icons.play_arrow))
+                                        : ElevatedButton(
+                                        onPressed: () async {
+                                          await SpotifySdk.pause();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          fixedSize: const Size(50, 50),
+                                          backgroundColor: Colors.green,
+                                          shape: const CircleBorder(),
+                                        ),
+                                        child: const Icon(Icons.pause_circle_outline)),
+                                    ElevatedButton(
+                                        onPressed: () async {
+                                          await SpotifySdk.skipNext();
+                                        },
+                                        style: ElevatedButton.styleFrom(
+                                          fixedSize: const Size(50, 50),
+                                          backgroundColor: Colors.green,
+                                          shape: const CircleBorder(),
+                                        ),
+                                        child: const Icon(Icons.skip_next)),
+                                    addTrackToLibrary(value.track?.uri ?? '1')
+                                  ],
+                                )
+
+                              ],
+                            );
+                          }
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(
+                    height: 10,
+                  ),
+                ],
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 
@@ -199,7 +449,7 @@ class _HomeState extends State<SpotifyAPI> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            getImageFromUri(currentTrackImageUri!),
+                            ImageFromUri(uri: currentTrackImageUri!),
                             const SizedBox(width: 20,),
                             Column(
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -222,7 +472,7 @@ class _HomeState extends State<SpotifyAPI> {
                                       ElevatedButton(
                                           onPressed: () async {
                                             await SpotifySdk.setRepeatMode(
-                                                repeatMode: RepeatMode.track);
+                                                repeatMode: repeat.RepeatMode.track);
                                             await SpotifySdk.toggleRepeat();
                                           },
                                           style: ElevatedButton.styleFrom(
@@ -298,10 +548,10 @@ class _HomeState extends State<SpotifyAPI> {
                     // state = await SpotifySdk.getLibraryState(spotifyUri: track.uri);
                     if (snapshot.data!.isSaved) {
                       await SpotifySdk.removeFromLibrary(spotifyUri: uri);
-                      setState(() {});
+                      // setState(() {});
                     } else {
                       await SpotifySdk.addToLibrary(spotifyUri: uri);
-                      setState(() {});
+                      // setState(() {});
                     }
                   },
                   style: ElevatedButton.styleFrom(
@@ -317,41 +567,6 @@ class _HomeState extends State<SpotifyAPI> {
             return const Text('Error');
           } else {
             return const Text('...');
-          }
-        });
-  }
-
-  Widget getImageFromUri(ImageUri uri) {
-    return FutureBuilder(
-        future: SpotifySdk.getImage(
-          imageUri: uri,
-          dimension: ImageDimension.medium,
-        ), // build again when Widget restart build
-        builder: (context, snapshot) {
-          if (snapshot.hasData) {
-            return Container(
-                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
-                height: 100,
-                width: 100,
-                child: ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: Image.memory(snapshot.data!)
-                )
-            );
-          } else if (snapshot.hasError) {
-            return const Text(
-              'Error when get image from URI',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.red,
-              ),
-            );
-          } else {
-            return const Text('Getting Image...',
-                style: TextStyle(
-                  fontSize: 20,
-                ));
           }
         });
   }
@@ -484,5 +699,50 @@ class _HomeState extends State<SpotifyAPI> {
         ),
       ),
     );
+  }
+}
+
+class ImageFromUri extends StatelessWidget {
+  const ImageFromUri({
+    super.key,
+    required this.uri,
+  });
+
+  final ImageUri uri;
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+        future: SpotifySdk.getImage(
+          imageUri: uri,
+          dimension: ImageDimension.medium,
+        ), // build again when Widget restart build
+        builder: (context, snapshot) {
+          if (snapshot.hasData) {
+            return Container(
+                decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
+                height: 100,
+                width: 100,
+                child: ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: Image.memory(snapshot.data!)
+                )
+            );
+          } else if (snapshot.hasError) {
+            return const Text(
+              'Error when get image from URI',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.red,
+              ),
+            );
+          } else {
+            return const Text('...',
+                style: TextStyle(
+                  fontSize: 20,
+                ));
+          }
+        });
   }
 }

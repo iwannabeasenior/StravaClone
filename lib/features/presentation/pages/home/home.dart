@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stravaclone/core/font/Post.dart' as icon;
-import 'package:stravaclone/features/data/source/local/local_storage_posts.dart';
-import 'package:stravaclone/features/domain/usecase/get_list_posts.dart';
+import 'package:stravaclone/helper/font/Post.dart' as icon;
+import 'package:stravaclone/features/domain/usecase/get_data_post.dart';
 import 'package:stravaclone/features/presentation/pages/home/widgets/profile_main.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 import '../map/vietmap.dart';
@@ -16,11 +15,9 @@ class HomePage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final usecase = context.read<GetListPosts>();
-    final localStorageImpl = context.read<LocalStorageImpl>();
     return ChangeNotifierProvider(
         create: (_) => HomeChangeNotifier(
-            getListPosts: usecase, localStorageImpl: localStorageImpl),
+            api: context.read<GetDataPost>()),
         child: const Home());
   }
 }
@@ -33,7 +30,6 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-  bool map = false;
   @override
   Widget build(BuildContext context) {
     double height = MediaQuery.of(context).size.height;
@@ -245,12 +241,6 @@ class _HomeState extends State<Home> {
                                 Navigator.push(context,
                                     MaterialPageRoute(builder: (context) {
                                   List<List<LatLng>> list = [];
-                                  // for (var coordinate
-                                  //     in home.posts[index].path!) {
-                                  //   list.add(LatLng(coordinate.latitude,
-                                  //       coordinate.longitude));
-                                  // }
-                                  // posts[index].path -> List<List<GeoPoint>> -> List<List<Latng>>
                                   for (var path in home.posts[index].path!) {
                                     List<LatLng> l = [];
                                     for (var coordinate
@@ -384,7 +374,6 @@ class _HomeState extends State<Home> {
                 right: 0,
                 left: 0,
                 bottom: 0,
-                // top: map ? 0 : -height,
                 height: home.openMap ? height - 33 : -height,
                 duration: const Duration(milliseconds: 500),
                 child: MyMap(home: home));
@@ -397,16 +386,10 @@ class _HomeState extends State<Home> {
   @override
   void initState() {
     super.initState();
-    fetch();
-  }
-
-  void fetch() async {
-    await Provider.of<HomeChangeNotifier>(context, listen: false)
-        .fetchAllPage().then((value) {
-          setState(() {});
-        });
-    // fetch done -> build widget, để setstate cho chắc trường hợp chưa xong thì còn rebuild
-    setState(() {});
+    // fectchAllPage will be called after ini and build finish
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Provider.of<HomeChangeNotifier>(context, listen: false).fetchAllPage();
+      });
   }
 
   String caculateTime({index}) {
@@ -418,4 +401,5 @@ class _HomeState extends State<Home> {
     String time = DateTime.parse(lastTimeISO.last).toLocal().toString();
     return time.substring(0, time.length - 7);
   }
+
 }

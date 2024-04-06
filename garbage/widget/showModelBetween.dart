@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 void main() {
-  runApp(MaterialApp(
+  runApp(const MaterialApp(
     home: HomePage()
   ));
 }
@@ -28,7 +28,7 @@ class HomePage extends StatelessWidget {
             },
           );
         },
-        child: Icon(Icons.open_in_browser_rounded),
+        child: const Icon(Icons.open_in_browser_rounded),
       )
     );
   }

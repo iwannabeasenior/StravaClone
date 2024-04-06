@@ -12,7 +12,7 @@ class WeatherAPIImpl implements WeatherAPI {
     final uri = Uri.https('api.weatherapi.com', '/v1/forecast.json',
         {
           'key' : 'a82d9ff2750d4e339a8100251231911',
-          'q' : '${lat},${long}',
+          'q' : '$lat,$long',
           'days' : '1',
         });
     final response = await http.get(uri);

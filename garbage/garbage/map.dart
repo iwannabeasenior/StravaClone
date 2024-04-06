@@ -8,7 +8,7 @@ import 'package:location/location.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:stravaclone/clean_architecture/features/presentation/pages/map/widgets/spotify.dart';
 import 'package:stravaclone/font/weather.dart';
-import 'package:stravaclone/clean_architecture/features/presentation/pages/map/widgets/weather_api.dart';
+import 'package:stravaclone/clean_architecture/features/presentation/pages/map/widgets/weather.dart';
 import '../clean_architecture/core/font/spotify.dart';
 class MyMap extends StatefulWidget {
   const MyMap({super.key});

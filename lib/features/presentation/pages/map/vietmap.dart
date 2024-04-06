@@ -10,17 +10,16 @@ import 'package:provider/provider.dart';
 import 'package:screenshot/screenshot.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:stop_watch_timer/stop_watch_timer.dart';
+import 'package:stravaclone/features/data/source/network/strava_api.dart';
 import 'package:stravaclone/features/domain/entity/post.dart';
-import 'package:stravaclone/features/domain/usecase/get_top_50_tracks.dart';
-import 'package:stravaclone/features/domain/usecase/get_weather_today.dart';
-import 'package:stravaclone/features/domain/usecase/get_work_out_album.dart';
+import 'package:stravaclone/features/domain/usecase/get_data_spotify.dart';
+import 'package:stravaclone/features/domain/usecase/get_data_weather.dart';
 import 'package:stravaclone/features/presentation/pages/map/widgets/spotify.dart';
-import 'package:stravaclone/features/presentation/pages/map/widgets/strava.dart';
-import 'package:stravaclone/features/presentation/pages/map/widgets/weather_api.dart';
+import 'package:stravaclone/features/presentation/pages/map/widgets/weather.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
-import '../../../../core/font/location.dart' as location;
-import '../../../../core/font/spotify.dart';
-import '../../../../core/font/weather.dart';
+import '../../../../helper/font/location.dart' as location;
+import '../../../../helper/font/spotify.dart';
+import '../../../../helper/font/weather.dart';
 import '../../../data/models/post_model.dart';
 import '../../../domain/entity/track.dart';
 import '../../../domain/entity/weather.dart' as weather;
@@ -36,7 +35,7 @@ class MyMap extends StatefulWidget {
 
 class _MyMapState extends State<MyMap> {
 
-  FlutterAppAuth appAuth = FlutterAppAuth();
+  FlutterAppAuth appAuth = const FlutterAppAuth();
   late SharedPreferences sharedPreferences;
   var accessToken;
   var refreshToken;
@@ -180,164 +179,88 @@ class _MyMapState extends State<MyMap> {
                         ? StopWatchTimer.getDisplayTime(value)
                         : '00:00:00';
 
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          SizedBox(
-                            height: 95,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    return Column(
+                      children: [
+                        Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: [
+                            SizedBox(
+                              height: 95,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      const Text('DISTANCE (KM)'),
+                                      const SizedBox(height: 5),
+                                      Text(dis.toStringAsFixed(2),
+                                          style: const TextStyle(
+                                              fontSize: 50,
+                                              fontWeight: FontWeight.w500)),
+                                    ],
+                                  ),
+                                  const VerticalDivider(
+                                      width: 1,
+                                      thickness: 0.5,
+                                      color: Colors.grey,
+                                      indent: 15,
+                                      endIndent: 15),
+                                  Column(
+                                    children: [
+                                      const SizedBox(
+                                        height: 5,
+                                      ),
+                                      const Text('PACE (KM/H)'),
+                                      const SizedBox(height: 5),
+                                      Text(
+                                          (value != null)
+                                              ? (dis /
+                                                      ((double.parse(
+                                                              value.toString())) /
+                                                          (1000 * 3600)))
+                                                  .toStringAsFixed(2)
+                                              : '0.00',
+                                          style: const TextStyle(
+                                              fontSize: 50,
+                                              fontWeight: FontWeight.w500)),
+                                    ],
+                                  )
+                                ],
+                              ),
+                            ),
+                            const Divider(color: Colors.grey),
+                            Column(
                               children: [
-                                Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    const Text('DISTANCE (KM)'),
-                                    const SizedBox(height: 5),
-                                    Text(dis.toStringAsFixed(2),
-                                        style: const TextStyle(
-                                            fontSize: 50,
-                                            fontWeight: FontWeight.w500)),
-                                  ],
+                                const SizedBox(
+                                  height: 3,
                                 ),
-                                const VerticalDivider(
-                                    width: 1,
-                                    thickness: 0.5,
-                                    color: Colors.grey,
-                                    indent: 15,
-                                    endIndent: 15),
-                                Column(
-                                  children: [
-                                    const SizedBox(
-                                      height: 5,
-                                    ),
-                                    const Text('PACE (KM/H)'),
-                                    const SizedBox(height: 5),
-                                    Text(
-                                        (value != null)
-                                            ? (dis /
-                                                    ((double.parse(
-                                                            value.toString())) /
-                                                        (1000 * 3600)))
-                                                .toStringAsFixed(2)
-                                            : '0.00',
-                                        style: const TextStyle(
-                                            fontSize: 50,
-                                            fontWeight: FontWeight.w500)),
-                                  ],
-                                )
+                                const Text(
+                                  'TIME',
+                                ),
+                                const SizedBox(
+                                  height: 5,
+                                ),
+                                Text(displayTime.substring(0, 8),
+                                    style: const TextStyle(
+                                        fontSize: 60,
+                                        fontWeight: FontWeight.w500)),
                               ],
                             ),
-                          ),
-                          const Divider(color: Colors.grey),
-                          Column(
-                            children: [
-                              const SizedBox(
-                                height: 3,
-                              ),
-                              const Text(
-                                'TIME',
-                              ),
-                              const SizedBox(
-                                height: 5,
-                              ),
-                              Text(displayTime.substring(0, 8),
-                                  style: const TextStyle(
-                                      fontSize: 60,
-                                      fontWeight: FontWeight.w500)),
-                            ],
-                          ),
-                          const Divider(color: Colors.grey),
-                          SizedBox(
-                            height: 95,
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceAround,
-                              children: [
-                                Expanded(
-                                  flex: 1,
-                                  child: IconButton(
-                                    onPressed: () async {
-                                      showModalBottomSheet(
-                                        backgroundColor: Colors.blue,
-                                          shape: const RoundedRectangleBorder(
-                                            borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                                          ),
-                                          elevation: 10,
-                                          isScrollControlled: true,
-                                          context: context,
-                                          builder: (context) {
-                                            return Container(
-                                                decoration: BoxDecoration(
-                                                  borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                                                  gradient: LinearGradient(
-                                                    begin: Alignment.topCenter,
-                                                    colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
-                                                  )
-                                                ),
-                                                height: 500,
-                                                child: tracks50.isEmpty ? FutureBuilder(
-                                                    future: get50AndTopTracks(),
-                                                    builder: (context, snapshot) {
-                                                      switch(snapshot.connectionState) {
-                                                        case ConnectionState.waiting : return  Center(child: CircularProgressIndicator());
-                                                        default:
-                                                          if (snapshot.hasError) {
-                                                            log.d(snapshot.error);
-                                                            return Text('nothing');
-                                                          } else {
-                                                            return SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut);
-                                                          }
-                                                      }
-                                                    }
-                                                ) : SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut,)
-                                            );
-                                          });
-                                    },
-                                    icon: const Icon(
-                                      Spotify.spotify,
-                                      size: 40,
-                                      color: Colors.black,
-                                    ),
-                                  ),
-                                ),
-                                const VerticalDivider(
-                                  endIndent: 15,
-                                  indent: 10,
-                                  width: 1,
-                                  thickness: 0.5,
-                                  color: Colors.grey,
-                                ),
-                                Expanded(
-                                  flex: 2,
-                                  child: AnimatedSwitcher(
-                                      switchInCurve: Curves.easeInOutBack,
-                                      transitionBuilder: (child, animation) =>
-                                          ScaleTransition(
-                                              scale: animation, child: child),
-                                      duration:
-                                          const Duration(milliseconds: 300),
-                                      child: !exchange
-                                          ? startButton()
-                                          : resumeFinishButton(
-                                              value: value,
-                                              displayTime: displayTime)),
-                                ),
-                                const VerticalDivider(
-                                  endIndent: 15,
-                                  indent: 10,
-                                  width: 1,
-                                  thickness: 0.5,
-                                  color: Colors.grey,
-                                ),
-                                Expanded(
-                                  flex: 1,
-                                  child: IconButton(
+                            const Divider(color: Colors.grey),
+                            SizedBox(
+                              height: 95,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                children: [
+                                  Expanded(
+                                    flex: 1,
+                                    child: IconButton(
                                       onPressed: () async {
-
                                         showModalBottomSheet(
-                                            backgroundColor: Colors.white,
+                                          backgroundColor: Colors.blue,
                                             shape: const RoundedRectangleBorder(
                                               borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
                                             ),
@@ -347,47 +270,125 @@ class _MyMapState extends State<MyMap> {
                                             builder: (context) {
                                               return Container(
                                                   decoration: BoxDecoration(
-                                                      borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                                                      gradient: LinearGradient(
-                                                          begin: Alignment.topCenter,
-                                                          colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
-                                                      )
+                                                    borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                                                    gradient: LinearGradient(
+                                                      begin: Alignment.topCenter,
+                                                      colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
+                                                    )
                                                   ),
                                                   height: 500,
-                                                  child:
-                                                    hours.isEmpty ? FutureBuilder(
-                                                      future: context.read<GetWeatherToday>()
-                                                        .call(lat: currentLocation!.latitude,
-                                                              long: currentLocation!.longitude,),
+                                                  child: tracks50.isEmpty ? FutureBuilder(
+                                                      future: get50AndTopTracks(),
                                                       builder: (context, snapshot) {
                                                         switch(snapshot.connectionState) {
-                                                          case ConnectionState.waiting : return Center(child: CircularProgressIndicator());
+                                                          case ConnectionState.waiting : return  const Center(child: CircularProgressIndicator());
                                                           default:
                                                             if (snapshot.hasError) {
                                                               log.d(snapshot.error);
-                                                              return Text('nothing');
+                                                              return const Text('nothing');
                                                             } else {
-                                                              hours = snapshot.data!;
-                                                              return weatherAPIWidget(hours: hours);
+                                                              return SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut);
                                                             }
                                                         }
                                                       }
-                                                    ) : weatherAPIWidget(hours: hours)
-
+                                                  ) : SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut,)
                                               );
                                             });
                                       },
                                       icon: const Icon(
-                                        Weather.cloud_sun_inv,
+                                        Spotify.spotify,
                                         size: 40,
-                                      )
+                                        color: Colors.black,
+                                      ),
+                                    ),
                                   ),
-                                )
-                              ],
-                            ),
-                          )
-                        ],
-                      ),
+                                  const VerticalDivider(
+                                    endIndent: 15,
+                                    indent: 10,
+                                    width: 1,
+                                    thickness: 0.5,
+                                    color: Colors.grey,
+                                  ),
+                                  Expanded(
+                                    flex: 2,
+                                    child: AnimatedSwitcher(
+                                        switchInCurve: Curves.easeInOutBack,
+                                        transitionBuilder: (child, animation) =>
+                                            ScaleTransition(
+                                                scale: animation, child: child),
+                                        duration:
+                                            const Duration(milliseconds: 300),
+                                        child: !exchange
+                                            ? startButton()
+                                            : resumeFinishButton(
+                                                value: value,
+                                                displayTime: displayTime)),
+                                  ),
+                                  const VerticalDivider(
+                                    endIndent: 15,
+                                    indent: 10,
+                                    width: 1,
+                                    thickness: 0.5,
+                                    color: Colors.grey,
+                                  ),
+                                  Expanded(
+                                    flex: 1,
+                                    child: IconButton(
+                                        onPressed: () async {
+
+                                          showModalBottomSheet(
+                                              backgroundColor: Colors.white,
+                                              shape: const RoundedRectangleBorder(
+                                                borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                                              ),
+                                              elevation: 10,
+                                              isScrollControlled: true,
+                                              context: context,
+                                              builder: (context) {
+                                                return Container(
+                                                    decoration: BoxDecoration(
+                                                        borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                                                        gradient: LinearGradient(
+                                                            begin: Alignment.topCenter,
+                                                            colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
+                                                        )
+                                                    ),
+                                                    height: 500,
+                                                    child:
+                                                      hours.isEmpty ? FutureBuilder(
+                                                        future: context.read<GetDataWeather>()
+                                                          .getWeatherToday(lat: currentLocation!.latitude,
+                                                                long: currentLocation!.longitude,),
+                                                        builder: (context, snapshot) {
+                                                          switch(snapshot.connectionState) {
+                                                            case ConnectionState.waiting : return const Center(child: CircularProgressIndicator());
+                                                            default:
+                                                              if (snapshot.hasError) {
+                                                                log.d(snapshot.error);
+                                                                return const Text('nothing');
+                                                              } else {
+                                                                hours = snapshot.data!;
+                                                                return weatherAPIWidget(hours: hours);
+                                                              }
+                                                          }
+                                                        }
+                                                      ) : weatherAPIWidget(hours: hours)
+
+                                                );
+                                              });
+                                        },
+                                        icon: const Icon(
+                                          Weather.cloud_sun_inv,
+                                          size: 40,
+                                        )
+                                    ),
+                                  )
+                                ],
+                              ),
+                            )
+                          ],
+                        ),
+                      ],
                     );
                   },
                 )
@@ -533,7 +534,7 @@ class _MyMapState extends State<MyMap> {
         ),
         ElevatedButton(
             onPressed: () {
-              Navigator.push(context, PageTransition(duration: Duration(milliseconds: 500),child: buildSaveActivity(
+              Navigator.push(context, PageTransition(duration: const Duration(milliseconds: 500),child: buildSaveActivity(
                 context,
                 distance: double.parse(dis.toStringAsFixed(2)),
                 speed: double.parse(
@@ -606,7 +607,7 @@ class _MyMapState extends State<MyMap> {
                 Column(
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    SizedBox(height: 30,),
+                    const SizedBox(height: 30,),
                     Container(
                       decoration: BoxDecoration(
                         border: Border.all(
@@ -614,7 +615,7 @@ class _MyMapState extends State<MyMap> {
                         ),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: TextField(
+                      child: const TextField(
                         style: TextStyle(
                         ),
                         decoration: InputDecoration(
@@ -625,7 +626,7 @@ class _MyMapState extends State<MyMap> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20),
+                    const SizedBox(height: 20),
                     Container(
                       height: 100,
                       decoration: BoxDecoration(
@@ -634,7 +635,7 @@ class _MyMapState extends State<MyMap> {
                         ),
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      child: TextField(
+                      child: const TextField(
                         maxLines: 4,
                         style: TextStyle(
                         ),
@@ -646,7 +647,7 @@ class _MyMapState extends State<MyMap> {
                         ),
                       ),
                     ),
-                    SizedBox(height: 20,),
+                    const SizedBox(height: 20,),
                     SizedBox(
                       height: 60,
                       width: double.infinity,
@@ -655,38 +656,38 @@ class _MyMapState extends State<MyMap> {
                         children: [
                           Column(
                             children: [
-                              Text('Time', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
-                              SizedBox(height: 10,),
-                              Text('${time}', style: TextStyle(fontSize: 18),)
+                              const Text('Time', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
+                              const SizedBox(height: 10,),
+                              Text('$time', style: const TextStyle(fontSize: 18),)
                             ],
                           ),
-                          VerticalDivider(color: Colors.grey, width: 2,),
+                          const VerticalDivider(color: Colors.grey, width: 2,),
                           Column(
                             children: [
-                              Text('Distance (km)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
-                              SizedBox(height: 10, ),
-                              Text('${distance}', style: TextStyle(fontSize: 18))
+                              const Text('Distance (km)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
+                              const SizedBox(height: 10, ),
+                              Text('$distance', style: const TextStyle(fontSize: 18))
                             ],
                           ),
-                          VerticalDivider(color: Colors.grey, width: 2,),
+                          const VerticalDivider(color: Colors.grey, width: 2,),
                           Column(
                             children: [
-                              Text('Pace (km/h)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange), ),
-                              SizedBox(height: 10,),
-                              Text('${speed}',  style: TextStyle(fontSize: 18))
+                              const Text('Pace (km/h)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange), ),
+                              const SizedBox(height: 10,),
+                              Text('$speed',  style: const TextStyle(fontSize: 18))
                             ],
                           ),
 
                         ],
                       ),
                     ),
-                    SizedBox(height: 20,),
+                    const SizedBox(height: 20,),
                     Container(
                       height: 50,
                       width: double.infinity,
                       decoration: BoxDecoration(
                         // color: Colors.deepOrange,
-                        gradient: LinearGradient(
+                        gradient: const LinearGradient(
                           begin: Alignment.centerLeft,
                           colors: [Colors.deepOrange, Colors.blue]
                         ),
@@ -710,7 +711,7 @@ class _MyMapState extends State<MyMap> {
                                     crossAxisAlignment: CrossAxisAlignment.center,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Text(
+                                      const Text(
                                         'Do you want to discard this activity?', style: TextStyle(fontSize: 30),
                                       ),
                                       Row(
@@ -730,12 +731,12 @@ class _MyMapState extends State<MyMap> {
                                               altitude.clear();
                                               await controller.clearLines();
                                             },
-                                            child: Text('YES'),),
+                                            child: const Text('YES'),),
                                           TextButton(
                                             onPressed: () {
                                               Navigator.pop(context);
                                             },
-                                            child: Text('NO')
+                                            child: const Text('NO')
                                           )
                                         ],
                                       )
@@ -745,7 +746,7 @@ class _MyMapState extends State<MyMap> {
                               ),
                           );
                         },
-                        child: Center(child: Text('Discard Activity', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),)),
+                        child: const Center(child: Text('Discard Activity', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),)),
                       ),
                     )
                   ],
@@ -785,11 +786,11 @@ class _MyMapState extends State<MyMap> {
 
                           if (image != null && timeIso.isNotEmpty) {
                             await createGPXFile(paths, altitude, timeIso);
-                            await APICall();
+                            await StravaAPIImpl().pushActivity();
                             await widget.home.addPost(post);
                           } else {
                             ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(content: Text('Error happened with your activity, do it again'))
+                              const SnackBar(content: Text('Error happened with your activity, do it again'))
                             );
                           }
 
@@ -889,7 +890,7 @@ class _MyMapState extends State<MyMap> {
     refreshToken = sharedPreferences.get('refreshToken');
     expiredAt = sharedPreferences.get('expiredAt');
 
-    if (expiredAt != null &&  DateTime.fromMicrosecondsSinceEpoch(expiredAt as int).isBefore(DateTime.now())) {
+    if (expiredAt != null && refreshToken != null && DateTime.fromMicrosecondsSinceEpoch(expiredAt as int).isBefore(DateTime.now())) {
       final TokenResponse? result = await appAuth.token(TokenRequest('47ddd41f0b974c40892de24a73dac073', 'stravaflutter://redirect',
           discoveryUrl: 'https://accounts.spotify.com/.well-known/openid-configuration?client_id=47ddd41f0b974c40892de24a73dac073',
           refreshToken: refreshToken,
@@ -933,9 +934,10 @@ class _MyMapState extends State<MyMap> {
         // run get accessToken and set
         await getAccessTokenRefreshToken();
       }
+      // await getAccessTokenRefreshToken();
       albumWorkOut =
-      await context.read<GetWorkOutAlbum>().call(token: accessToken);
-      tracks50 = await context.read<GetTop50Tracks>().call(token: accessToken);
+      await context.read<GetDataSpotify>().getWorkOutAlbulm(token: accessToken);
+      tracks50 = await context.read<GetDataSpotify>().getTop50Tracks(token: accessToken);
     } catch(e) {
       log.d(e);
     }

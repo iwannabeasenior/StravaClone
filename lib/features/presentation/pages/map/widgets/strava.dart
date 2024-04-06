@@ -9,7 +9,7 @@ import 'package:http_parser/http_parser.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 Future<void> APICall() async {
-  FlutterAppAuth appAuth = FlutterAppAuth();
+  FlutterAppAuth appAuth = const FlutterAppAuth();
   final SharedPreferences sharedPreferences = await SharedPreferences.getInstance();
   Random random = Random();
   int externalId = random.nextInt(1000000);
@@ -61,7 +61,7 @@ Future<void> APICall() async {
     expiredAt = jsonDecode(response.body)['expires_at'] as int;
     sharedPreferences.setString('accessTokenStrava', accessToken as String);
     sharedPreferences.setString('refreshTokenStrava', refreshToken as String);
-    sharedPreferences.setInt('expiredAtStrava', expiredAt as int);
+    sharedPreferences.setInt('expiredAtStrava', expiredAt);
   }
 
 
