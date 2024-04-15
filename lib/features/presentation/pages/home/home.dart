@@ -6,8 +6,9 @@ import 'package:stravaclone/helper/font/Post.dart' as icon;
 import 'package:stravaclone/features/domain/usecase/get_data_post.dart';
 import 'package:stravaclone/features/presentation/pages/home/widgets/profile_main.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
+import '../../../domain/entity/post.dart';
 import '../map/vietmap.dart';
-import 'home_change_notifier.dart';
+import '../../state/home_state.dart';
 import 'widgets/notification.dart';
 
 class HomePage extends StatelessWidget {
@@ -16,9 +17,10 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-        create: (_) => HomeChangeNotifier(
+        create: (_) => HomeState(
             api: context.read<GetDataPost>()),
-        child: const Home());
+        child: const Home()
+    );
   }
 }
 
@@ -72,17 +74,31 @@ class _HomeState extends State<Home> {
                     }));
                   },
                   icon: const Icon(Icons.settings)),
-              Consumer<HomeChangeNotifier>(builder: (context, home, child) {
-                return IconButton(
-                    onPressed: () {
-                      Navigator.push(context,
-                          MaterialPageRoute(builder: (context) {
-                        return NotificationHome(
-                            function: caculateTime, posts: home.posts);
-                      }));
-                    },
-                    icon: const Icon(Icons.add_alert_rounded));
-              }),
+              // Consumer<HomeChangeNotifier>(builder: (context, home, child) {
+              //   return IconButton(
+              //       onPressed: () {
+              //         Navigator.push(context,
+              //             MaterialPageRoute(builder: (context) {
+              //           return NotificationHome(
+              //               function: caculateTime, posts: home.posts);
+              //         }));
+              //       },
+              //       icon: const Icon(Icons.add_alert_rounded)
+              //   );
+              // }),
+              Selector<HomeState, List<Post>>(
+                  builder: (context, value, child) => IconButton(
+                      onPressed: () {
+                        Navigator.push(context,
+                            MaterialPageRoute(builder: (context) {
+                              return NotificationHome(
+                                  function: caculateTime, posts: value);
+                            }));
+                      },
+                      icon: const Icon(Icons.add_alert_rounded)
+                  ),
+                  selector: (p0, p1) => p1.posts,
+              )
             ],
             title: const Text('Home',
                 style: TextStyle(
@@ -90,18 +106,27 @@ class _HomeState extends State<Home> {
                     fontWeight: FontWeight.w600,
                     fontSize: 24)),
           ),
-          floatingActionButton: Consumer<HomeChangeNotifier>(
-            builder: (context, home, child) => FloatingActionButton(
-                backgroundColor: Colors.white,
-                onPressed: () async {
-                  home.changeStateOpenMap();
-                },
-                child: const Icon(
-                  Icons.run_circle,
-                  color: Colors.amber,
-                )),
+          // floatingActionButton: Consumer<HomeChangeNotifier>(
+          //   builder: (context, home, child) => FloatingActionButton(
+          //       backgroundColor: Colors.white,
+          //       onPressed: () async {
+          //         context.read<HomeChangeNotifier>().changeStateOpenMap();
+          //       },
+          //       child: const Icon(
+          //         Icons.run_circle,
+          //         color: Colors.amber,
+          //       )),
+          // ),
+          floatingActionButton: FloatingActionButton(
+            backgroundColor: Colors.white,
+            onPressed: () => context.read<HomeState>().changeStateOpenMap(),
+            child: const Icon(
+              Icons.run_circle,
+              color: Colors.amber,
+            ),
           ),
-          body: Consumer<HomeChangeNotifier>(builder: (context, home, child) {
+
+          body: Consumer<HomeState>(builder: (context, home, child) {
             return CustomScrollView(
               physics: const BouncingScrollPhysics(),
               slivers: <Widget>[
@@ -131,9 +156,9 @@ class _HomeState extends State<Home> {
                                 Row(
                                   children: [
                                     const Icon(Icons.directions_run, size: 18),
-                                    const SizedBox(
-                                      width: 10,
-                                    ),
+
+                                    const SizedBox(width: 10),
+
                                     Text.rich(TextSpan(
                                         text: caculateTime(index: index),
                                         style: const TextStyle(
@@ -176,11 +201,11 @@ class _HomeState extends State<Home> {
                           ),
                           const SizedBox(height: 15),
                           Container(
-                            margin: const EdgeInsets.only(right: 150),
+                            // margin: const EdgeInsets.only(right: 150),
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             height: 70,
                             child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                              mainAxisAlignment: MainAxisAlignment.start,
                               children: [
                                 Column(
                                   children: [
@@ -194,6 +219,7 @@ class _HomeState extends State<Home> {
                                         )),
                                   ],
                                 ),
+                                const SizedBox(width: 10),
                                 const VerticalDivider(
                                   indent: 10,
                                   endIndent: 30,
@@ -201,6 +227,7 @@ class _HomeState extends State<Home> {
                                   thickness: 1,
                                   color: Colors.grey,
                                 ),
+                                const SizedBox(width: 10),
                                 Column(
                                   children: [
                                     const Text('Pace'),
@@ -212,6 +239,7 @@ class _HomeState extends State<Home> {
                                             fontWeight: FontWeight.w400)),
                                   ],
                                 ),
+                                const SizedBox(width: 10),
                                 const VerticalDivider(
                                   indent: 10,
                                   endIndent: 30,
@@ -219,6 +247,7 @@ class _HomeState extends State<Home> {
                                   thickness: 1,
                                   color: Colors.grey,
                                 ),
+                                const SizedBox(width: 10),
                                 Column(
                                   children: [
                                     const Text('Time'),
@@ -314,9 +343,7 @@ class _HomeState extends State<Home> {
                               mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
                                 IconButton(
-                                    onPressed: () {
-
-                                    },
+                                    onPressed: () {},
                                     icon: const Icon(icon.Post.thumbs_up),
                                     color: Colors.deepOrange),
                                 const VerticalDivider(
@@ -368,16 +395,19 @@ class _HomeState extends State<Home> {
             );
           }),
         ),
-        Consumer<HomeChangeNotifier>(
-          builder: (context, home, child) {
+        Selector<HomeState, bool>(
+          builder: (context, value, child) {
             return AnimatedPositioned(
                 right: 0,
                 left: 0,
                 bottom: 0,
-                height: home.openMap ? height - 33 : -height,
-                duration: const Duration(milliseconds: 500),
-                child: MyMap(home: home));
+                // height: home.openMap ? height -15 : -height,
+                top: value ? 0 : height,
+                duration: const Duration(milliseconds: 300),
+                child: const MyMap()
+            );
           },
+          selector: (p0, p1) => p1.openMap,
         )
       ],
     );
@@ -388,12 +418,12 @@ class _HomeState extends State<Home> {
     super.initState();
     // fectchAllPage will be called after ini and build finish
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Provider.of<HomeChangeNotifier>(context, listen: false).fetchAllPage();
+        Provider.of<HomeState>(context, listen: false).fetchAllPage();
       });
   }
 
   String caculateTime({index}) {
-    var posts = Provider.of<HomeChangeNotifier>(context, listen: false)
+    var posts = Provider.of<HomeState>(context, listen: false)
         .posts[index]
         .timeISO;
     var lastTimeISO = posts!.last;

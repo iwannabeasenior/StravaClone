@@ -23,12 +23,12 @@ import '../../../../helper/font/weather.dart';
 import '../../../data/models/post_model.dart';
 import '../../../domain/entity/track.dart';
 import '../../../domain/entity/weather.dart' as weather;
+import '../../state/map_state.dart';
 import '../../support/generate_gpx_file.dart';
-import '../home/home_change_notifier.dart';
+import '../../state/home_state.dart';
 
 class MyMap extends StatefulWidget {
-  HomeChangeNotifier home;
-  MyMap({super.key, required this.home});
+  const MyMap({super.key});
   @override
   State<MyMap> createState() => _MyMapState();
 }
@@ -46,9 +46,9 @@ class _MyMapState extends State<MyMap> {
   late VietmapController controller;
   bool setZoom = false; // set zoom = 18 when map is created
   final timeClock = StopWatchTimer();
-  double dis = 0.00;
-  bool start = false; // or not user start running
-  bool exchange = false; // change from stop to resume/end and reverse
+  // double dis = 0.00;
+  // bool start = false; // or not user start running
+  // bool exchange = false; // change from stop to resume/end and reverse
   double zoom = 16; // save zoom of camera of map
   LatLng? currentLocation;
 
@@ -70,9 +70,8 @@ class _MyMapState extends State<MyMap> {
 
   @override
   void initState() {
-    checkPermision();
     super.initState();
-    setState(() {});
+    checkPermision();
   }
 
   @override
@@ -83,6 +82,7 @@ class _MyMapState extends State<MyMap> {
 
   @override
   Widget build(BuildContext context) {
+    var api = context.read<HomeState>();
     return SafeArea(
         child: Scaffold(
             appBar: AppBar(
@@ -93,7 +93,7 @@ class _MyMapState extends State<MyMap> {
                 ),
                 // color: Colors.deepOrange,
                 onPressed: () {
-                  widget.home.changeStateOpenMap();
+                  api.changeStateOpenMap();
                 },
               ),
               title: const Center(
@@ -149,22 +149,27 @@ class _MyMapState extends State<MyMap> {
                     ),
                   ),
                 ),
-                AnimatedPositioned(
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    height: (!timeClock.isRunning && start == true) ? 40 : 0,
-                    duration: const Duration(milliseconds: 300),
-                    child: Container(
-                      color: Colors.deepOrange,
-                      height: 40,
-                      width: double.infinity,
-                      child: const Center(
-                          child: Text(
-                        'STOPPED',
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      )),
-                    )
+                Selector<MapState, bool>(
+                  selector: (p0, p1) => p1.start,
+                  builder: (context, start, child) {
+                    return AnimatedPositioned(
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        height: (!timeClock.isRunning && start == true) ? 40 : 0,
+                        duration: const Duration(milliseconds: 300),
+                        child: Container(
+                          color: Colors.deepOrange,
+                          height: 40,
+                          width: double.infinity,
+                          child: const Center(
+                              child: Text(
+                            'STOPPED',
+                            style: TextStyle(color: Colors.white, fontSize: 20),
+                          )),
+                        )
+                    );
+                  }
                 ),
               ],
             ),
@@ -180,16 +185,19 @@ class _MyMapState extends State<MyMap> {
                         : '00:00:00';
 
                     return Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Column(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            SizedBox(
-                              height: 95,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Column(
+                        Flexible(
+                          flex: 1,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Selector<MapState, double>(
+                                selector: (p0, p1) => p1.dis,
+                                builder: (context, dis, child) {
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const SizedBox(
                                         height: 5,
@@ -201,14 +209,20 @@ class _MyMapState extends State<MyMap> {
                                               fontSize: 50,
                                               fontWeight: FontWeight.w500)),
                                     ],
-                                  ),
-                                  const VerticalDivider(
-                                      width: 1,
-                                      thickness: 0.5,
-                                      color: Colors.grey,
-                                      indent: 15,
-                                      endIndent: 15),
-                                  Column(
+                                  );
+                                }
+                              ),
+                              const VerticalDivider(
+                                  width: 1,
+                                  thickness: 0.5,
+                                  color: Colors.grey,
+                                  indent: 15,
+                                  endIndent: 15),
+                              Selector<MapState, double>(
+                                selector: (p0, p1) => p1.dis,
+                                builder: (context, dis, child) {
+                                  return Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       const SizedBox(
                                         height: 5,
@@ -227,89 +241,98 @@ class _MyMapState extends State<MyMap> {
                                               fontSize: 50,
                                               fontWeight: FontWeight.w500)),
                                     ],
-                                  )
-                                ],
+                                  );
+                                }
+                              )
+                            ],
+                          ),
+                        ),
+                        const Divider(color: Colors.grey),
+                        Flexible(
+                          flex: 1,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const SizedBox(
+                                height: 3,
                               ),
-                            ),
-                            const Divider(color: Colors.grey),
-                            Column(
-                              children: [
-                                const SizedBox(
-                                  height: 3,
-                                ),
-                                const Text(
-                                  'TIME',
-                                ),
-                                const SizedBox(
-                                  height: 5,
-                                ),
-                                Text(displayTime.substring(0, 8),
-                                    style: const TextStyle(
-                                        fontSize: 60,
-                                        fontWeight: FontWeight.w500)),
-                              ],
-                            ),
-                            const Divider(color: Colors.grey),
-                            SizedBox(
-                              height: 95,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                                children: [
-                                  Expanded(
-                                    flex: 1,
-                                    child: IconButton(
-                                      onPressed: () async {
-                                        showModalBottomSheet(
-                                          backgroundColor: Colors.blue,
-                                            shape: const RoundedRectangleBorder(
-                                              borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                                            ),
-                                            elevation: 10,
-                                            isScrollControlled: true,
-                                            context: context,
-                                            builder: (context) {
-                                              return Container(
-                                                  decoration: BoxDecoration(
-                                                    borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                                                    gradient: LinearGradient(
-                                                      begin: Alignment.topCenter,
-                                                      colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
-                                                    )
-                                                  ),
-                                                  height: 500,
-                                                  child: tracks50.isEmpty ? FutureBuilder(
-                                                      future: get50AndTopTracks(),
-                                                      builder: (context, snapshot) {
-                                                        switch(snapshot.connectionState) {
-                                                          case ConnectionState.waiting : return  const Center(child: CircularProgressIndicator());
-                                                          default:
-                                                            if (snapshot.hasError) {
-                                                              log.d(snapshot.error);
-                                                              return const Text('nothing');
-                                                            } else {
-                                                              return SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut);
-                                                            }
+                              const Text(
+                                'TIME',
+                              ),
+                              const SizedBox(
+                                height: 5,
+                              ),
+                              Text(displayTime.substring(0, 8),
+                                  style: const TextStyle(
+                                      fontSize: 60,
+                                      fontWeight: FontWeight.w500)),
+                            ],
+                          ),
+                        ),
+                        const Divider(color: Colors.grey),
+                        Flexible(
+                          flex: 1,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Expanded(
+                                flex: 1,
+                                child: IconButton(
+                                  onPressed: () async {
+                                    showModalBottomSheet(
+                                      backgroundColor: Colors.blue,
+                                        shape: const RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                                        ),
+                                        elevation: 10,
+                                        isScrollControlled: true,
+                                        context: context,
+                                        builder: (context) {
+                                          return Container(
+                                              decoration: BoxDecoration(
+                                                borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                                                gradient: LinearGradient(
+                                                  begin: Alignment.topCenter,
+                                                  colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
+                                                )
+                                              ),
+                                              height: 500,
+                                              child: tracks50.isEmpty ? FutureBuilder(
+                                                  future: get50AndTopTracks(),
+                                                  builder: (context, snapshot) {
+                                                    switch(snapshot.connectionState) {
+                                                      case ConnectionState.waiting : return  const Center(child: CircularProgressIndicator());
+                                                      default:
+                                                        if (snapshot.hasError) {
+                                                          log.d(snapshot.error);
+                                                          return const Text('nothing');
+                                                        } else {
+                                                          return SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut);
                                                         }
-                                                      }
-                                                  ) : SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut,)
-                                              );
-                                            });
-                                      },
-                                      icon: const Icon(
-                                        Spotify.spotify,
-                                        size: 40,
-                                        color: Colors.black,
-                                      ),
-                                    ),
+                                                    }
+                                                  }
+                                              ) : SpotifyAPI(tracks50: tracks50, albumWorkOut: albumWorkOut,)
+                                          );
+                                        });
+                                  },
+                                  icon: const Icon(
+                                    Spotify.spotify,
+                                    size: 40,
+                                    color: Colors.black,
                                   ),
-                                  const VerticalDivider(
-                                    endIndent: 15,
-                                    indent: 10,
-                                    width: 1,
-                                    thickness: 0.5,
-                                    color: Colors.grey,
-                                  ),
-                                  Expanded(
+                                ),
+                              ),
+                              const VerticalDivider(
+                                endIndent: 15,
+                                indent: 10,
+                                width: 1,
+                                thickness: 0.5,
+                                color: Colors.grey,
+                              ),
+                              Selector<MapState, bool>(
+                                selector: (p0, p1) => p1.exchange,
+                                builder: (context, valueInside, childInside) {
+                                  return Expanded(
                                     flex: 2,
                                     child: AnimatedSwitcher(
                                         switchInCurve: Curves.easeInOutBack,
@@ -318,76 +341,76 @@ class _MyMapState extends State<MyMap> {
                                                 scale: animation, child: child),
                                         duration:
                                             const Duration(milliseconds: 300),
-                                        child: !exchange
+                                        child: !valueInside
                                             ? startButton()
                                             : resumeFinishButton(
                                                 value: value,
-                                                displayTime: displayTime)),
-                                  ),
-                                  const VerticalDivider(
-                                    endIndent: 15,
-                                    indent: 10,
-                                    width: 1,
-                                    thickness: 0.5,
-                                    color: Colors.grey,
-                                  ),
-                                  Expanded(
-                                    flex: 1,
-                                    child: IconButton(
-                                        onPressed: () async {
-
-                                          showModalBottomSheet(
-                                              backgroundColor: Colors.white,
-                                              shape: const RoundedRectangleBorder(
-                                                borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                                              ),
-                                              elevation: 10,
-                                              isScrollControlled: true,
-                                              context: context,
-                                              builder: (context) {
-                                                return Container(
-                                                    decoration: BoxDecoration(
-                                                        borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
-                                                        gradient: LinearGradient(
-                                                            begin: Alignment.topCenter,
-                                                            colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
-                                                        )
-                                                    ),
-                                                    height: 500,
-                                                    child:
-                                                      hours.isEmpty ? FutureBuilder(
-                                                        future: context.read<GetDataWeather>()
-                                                          .getWeatherToday(lat: currentLocation!.latitude,
-                                                                long: currentLocation!.longitude,),
-                                                        builder: (context, snapshot) {
-                                                          switch(snapshot.connectionState) {
-                                                            case ConnectionState.waiting : return const Center(child: CircularProgressIndicator());
-                                                            default:
-                                                              if (snapshot.hasError) {
-                                                                log.d(snapshot.error);
-                                                                return const Text('nothing');
-                                                              } else {
-                                                                hours = snapshot.data!;
-                                                                return weatherAPIWidget(hours: hours);
-                                                              }
-                                                          }
-                                                        }
-                                                      ) : weatherAPIWidget(hours: hours)
-
-                                                );
-                                              });
-                                        },
-                                        icon: const Icon(
-                                          Weather.cloud_sun_inv,
-                                          size: 40,
-                                        )
-                                    ),
-                                  )
-                                ],
+                                                displayTime: displayTime, api: api)),
+                                  );
+                                }
                               ),
-                            )
-                          ],
-                        ),
+                              const VerticalDivider(
+                                endIndent: 15,
+                                indent: 10,
+                                width: 1,
+                                thickness: 0.5,
+                                color: Colors.grey,
+                              ),
+                              Expanded(
+                                flex: 1,
+                                child: IconButton(
+                                    onPressed: () async {
+
+                                      showModalBottomSheet(
+                                          backgroundColor: Colors.white,
+                                          shape: const RoundedRectangleBorder(
+                                            borderRadius: BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                                          ),
+                                          elevation: 10,
+                                          isScrollControlled: true,
+                                          context: context,
+                                          builder: (context) {
+                                            return Container(
+                                                decoration: BoxDecoration(
+                                                    borderRadius: const BorderRadius.only(topRight: Radius.circular(20), topLeft: Radius.circular(20)),
+                                                    gradient: LinearGradient(
+                                                        begin: Alignment.topCenter,
+                                                        colors: [Colors.black.withOpacity(0.2), Colors.black.withOpacity(0.6)]
+                                                    )
+                                                ),
+                                                height: 500,
+                                                child:
+                                                  hours.isEmpty ? FutureBuilder(
+                                                    future: context.read<GetDataWeather>()
+                                                      .getWeatherToday(lat: currentLocation!.latitude,
+                                                            long: currentLocation!.longitude,),
+                                                    builder: (context, snapshot) {
+                                                      switch(snapshot.connectionState) {
+                                                        case ConnectionState.waiting : return const Center(child: CircularProgressIndicator());
+                                                        default:
+                                                          if (snapshot.hasError) {
+                                                            log.d(snapshot.error);
+                                                            return const Text('nothing');
+                                                          } else {
+                                                            hours = snapshot.data!;
+                                                            return weatherAPIWidget(hours: hours);
+                                                          }
+                                                      }
+                                                    }
+                                                  ) : weatherAPIWidget(hours: hours)
+
+                                            );
+                                          });
+                                    },
+                                    icon: const Icon(
+                                      Weather.cloud_sun_inv,
+                                      size: 40,
+                                    )
+                                ),
+                              )
+                            ],
+                          ),
+                        )
                       ],
                     );
                   },
@@ -402,7 +425,7 @@ class _MyMapState extends State<MyMap> {
       initialCameraPosition:
           const CameraPosition(target: LatLng(90, 100), zoom: 0),
       styleString:
-          'https://maps.vietmap.vn/api/maps/light/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
+          'https://maps.vietmap.vn/api/maps/raster/styles.json?apikey=c3d0f188ff669f89042771a20656579073cffec5a8a69747',
       onMapCreated: (VietmapController controllerMap) {
         controller = controllerMap;
       },
@@ -426,7 +449,7 @@ class _MyMapState extends State<MyMap> {
           if (len >= 2) {
             var distanceTwoPoint =
                 calculateDistance(pathsSon[len - 2], altitudeSon[len-2], pathsSon[len - 1], altitudeSon[len-1]);
-            dis += distanceTwoPoint;
+            context.read<MapState>().calculateDistance(distanceTwoPoint);
           }
           // calculate distance
           for (int i = 0; i < paths.length; i++) {
@@ -445,7 +468,6 @@ class _MyMapState extends State<MyMap> {
               polylineWidth: 3,
               polylineOpacity: 1,
               draggable: true));
-          setState(() {});
         }
       },
       myLocationTrackingMode: MyLocationTrackingMode.TrackingGPS,
@@ -462,372 +484,380 @@ class _MyMapState extends State<MyMap> {
   }
 
   Widget startButton() {
-    return ElevatedButton(
-        onPressed: () async {
-          if (!start) {
-            timeClock.onStartTimer();
-            setState(() {
-              start = true;
-            });
-          } else {
-            timeClock.onStopTimer();
-            exchange = true;
+    return Consumer<MapState>(
+      builder: (context, home, child) {
+        return ElevatedButton(
+            onPressed: () async {
+              if (!home.start) {
+                timeClock.onStartTimer();
+                home.changeStart();
+              } else {
+                timeClock.onStopTimer();
+                home.changeExchange();
 
-            // add path to paths
-            if (pathsSon.isNotEmpty) {
-              paths.add(List.from(pathsSon));
-              altitude.add(List.from(altitudeSon));
-              timeIso.add(List.from(timeIsoSon));
-              // clear data
-              pathsSon.clear();
-              timeIsoSon.clear();
-              altitudeSon.clear();
-            }
-            setState(() {});
-          }
-        },
-        style: ElevatedButton.styleFrom(
-            shape: const CircleBorder(),
-            fixedSize: const Size(80, 80),
-            backgroundColor: Colors.deepOrange,
-            shadowColor: Colors.lightBlueAccent),
-        child: !start
-            ? const Text(
-                'START',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13),
-              )
-            : const Icon(
-                Icons.stop,
-                size: 40,
-              )
-    );
-  }
-
-  Widget resumeFinishButton({value, displayTime}) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      children: [
-        InkWell(
-            onTap: () {
-              exchange = false;
-              timeClock.onStartTimer();
-
-              setState(() {});
-            },
-            child: Container(
-              height: 80,
-              width: 80,
-              decoration: BoxDecoration(
-                border: Border.all(color: Colors.deepOrange, width: 1),
-                shape: BoxShape.circle,
-              ),
-              child: const Center(
-                child: Text(
-                  'RESUME',
-                  style: TextStyle(
-                      color: Colors.deepOrange,
-                      fontWeight: FontWeight.bold,
-                      fontSize: 12),
-                ),
-              ),
-            )
-        ),
-        ElevatedButton(
-            onPressed: () {
-              Navigator.push(context, PageTransition(duration: const Duration(milliseconds: 500),child: buildSaveActivity(
-                context,
-                distance: double.parse(dis.toStringAsFixed(2)),
-                speed: double.parse(
-                    (dis / ((double.parse(value.toString())) / (1000 * 3600)))
-                        .toStringAsFixed(2)),
-                time: displayTime.substring(0, 8),
-              ), type: PageTransitionType.leftToRight));
-              // showModalBottomSheet(
-              //   context: context,
-              //   builder: (context) => buildSaveActivity(
-              //     context,
-              //     distance: double.parse(dis.toStringAsFixed(2)),
-              //     speed: double.parse(
-              //         (dis / ((double.parse(value.toString())) / (1000 * 3600)))
-              //             .toStringAsFixed(2)),
-              //     time: displayTime.substring(0, 8),
-              //   ),
-              //   isScrollControlled: true,
-              //   useSafeArea: true,
-              //   backgroundColor: Colors.white,
-              // );
+                // add path to paths
+                if (pathsSon.isNotEmpty) {
+                  paths.add(List.from(pathsSon));
+                  altitude.add(List.from(altitudeSon));
+                  timeIso.add(List.from(timeIsoSon));
+                  // clear data
+                  pathsSon.clear();
+                  timeIsoSon.clear();
+                  altitudeSon.clear();
+                }
+              }
             },
             style: ElevatedButton.styleFrom(
                 shape: const CircleBorder(),
                 fixedSize: const Size(80, 80),
                 backgroundColor: Colors.deepOrange,
                 shadowColor: Colors.lightBlueAccent),
-            child: const Text(
-              'FINISH',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-            )
-        ),
-      ],
+            child: !home.start
+                ? const Text(
+                    'START',
+                    style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                  )
+                : const Icon(
+                    Icons.stop,
+                    size: 40,
+                  )
+        );
+      }
+    );
+  }
+
+  Widget resumeFinishButton({value, displayTime, api}) {
+    return Consumer<MapState>(
+      // selector: (p0, p1) => p1.exchange,
+      builder: (context, home, child) {
+        return Row(
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+          children: [
+            InkWell(
+                onTap: () {
+                  home.changeExchange();
+                  timeClock.onStartTimer();
+                },
+                child: Container(
+                  height: 80,
+                  width: 80,
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.deepOrange, width: 1),
+                    shape: BoxShape.circle,
+                  ),
+                  child: const Center(
+                    child: Text(
+                      'RESUME',
+                      style: TextStyle(
+                          color: Colors.deepOrange,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 12),
+                    ),
+                  ),
+                )
+            ),
+            ElevatedButton(
+                onPressed: () {
+                  Navigator.push(context, PageTransition(duration: const Duration(milliseconds: 500),child: buildSaveActivity(
+                    context,
+                    distance: double.parse(context.read<MapState>().dis.toStringAsFixed(2)),
+                    speed: double.parse(
+                        (context.read<MapState>().dis / ((double.parse(value.toString())) / (1000 * 3600)))
+                            .toStringAsFixed(2)),
+                    time: displayTime.substring(0, 8),
+                    api: api
+                  ), type: PageTransitionType.leftToRight));
+                  // showModalBottomSheet(
+                  //   context: context,
+                  //   builder: (context) => buildSaveActivity(
+                  //     context,
+                  //     distance: double.parse(dis.toStringAsFixed(2)),
+                  //     speed: double.parse(
+                  //         (dis / ((double.parse(value.toString())) / (1000 * 3600)))
+                  //             .toStringAsFixed(2)),
+                  //     time: displayTime.substring(0, 8),
+                  //   ),
+                  //   isScrollControlled: true,
+                  //   useSafeArea: true,
+                  //   backgroundColor: Colors.white,
+                  // );
+                },
+                style: ElevatedButton.styleFrom(
+                    shape: const CircleBorder(),
+                    fixedSize: const Size(80, 80),
+                    backgroundColor: Colors.deepOrange,
+                    shadowColor: Colors.lightBlueAccent),
+                child: const Text(
+                  'FINISH',
+                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+                )
+            ),
+          ],
+        );
+      }
     );
   }
 
   Widget buildSaveActivity(BuildContext context,
-      {distance, speed, time}) {
-    return Scaffold(
-        appBar: AppBar(
-          title: const Padding(
-            padding: EdgeInsets.only(left: 50),
-            child: Text(
-              'Save Activity',
-              style: TextStyle(color: Colors.black, fontSize: 20),
+      {distance, speed, time, api}) {
+    return Consumer<MapState>(
+      builder: (context, home, child) {
+        return Scaffold(
+            appBar: AppBar(
+              title: const Padding(
+                padding: EdgeInsets.only(left: 50),
+                child: Text(
+                  'Save Activity',
+                  style: TextStyle(color: Colors.black, fontSize: 20),
+                ),
+              ),
+              backgroundColor: Colors.white,
+              leading: TextButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  home.changeExchange();
+                  timeClock.onStartTimer();
+                },
+                child: const Text('RESUME',
+                    style: TextStyle(
+                        fontSize: 15,
+                        color: Colors.deepOrange,
+                        fontWeight: FontWeight.w500)),
+              ),
+              leadingWidth: 100,
             ),
-          ),
-          backgroundColor: Colors.white,
-          leading: TextButton(
-            onPressed: () {
-              Navigator.pop(context);
-              exchange = false;
-              timeClock.onStartTimer();
-              setState(() {});
-            },
-            child: const Text('RESUME',
-                style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.deepOrange,
-                    fontWeight: FontWeight.w500)),
-          ),
-          leadingWidth: 100,
-        ),
-        body: Column(children: [
-          Expanded(
-            flex: 7,
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: ListView(scrollDirection: Axis.vertical, children: [
-                Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const SizedBox(height: 30,),
-                    Container(
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.grey,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const TextField(
-                        style: TextStyle(
-                        ),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                          prefixIcon: Icon(Icons.drive_file_rename_outline),
-                          hintText: 'Your activity name'
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    Container(
-                      height: 100,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                            color: Colors.grey,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: const TextField(
-                        maxLines: 4,
-                        style: TextStyle(
-                        ),
-                        decoration: InputDecoration(
-                          border: InputBorder.none,
-                          focusedBorder: InputBorder.none,
-                            prefixIcon: Icon(Icons.drive_file_rename_outline),
-                            hintText: 'Tập thể dục hằng ngày là điều thiết yếu để mang lại một cuộc sống hạnh phúc. Cố gắng duy trì đều đặn nhé!'
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 20,),
-                    SizedBox(
-                      height: 60,
-                      width: double.infinity,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          Column(
-                            children: [
-                              const Text('Time', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
-                              const SizedBox(height: 10,),
-                              Text('$time', style: const TextStyle(fontSize: 18),)
-                            ],
+            body: Column(children: [
+              Expanded(
+                flex: 7,
+                child: Padding(
+                  padding: const EdgeInsets.all(20),
+                  child: ListView(scrollDirection: Axis.vertical, children: [
+                    Column(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      children: [
+                        const SizedBox(height: 30,),
+                        Container(
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                              color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
-                          const VerticalDivider(color: Colors.grey, width: 2,),
-                          Column(
-                            children: [
-                              const Text('Distance (km)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
-                              const SizedBox(height: 10, ),
-                              Text('$distance', style: const TextStyle(fontSize: 18))
-                            ],
+                          child: const TextField(
+                            style: TextStyle(
+                            ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                              prefixIcon: Icon(Icons.drive_file_rename_outline),
+                              hintText: 'Your activity name'
+                            ),
                           ),
-                          const VerticalDivider(color: Colors.grey, width: 2,),
-                          Column(
-                            children: [
-                              const Text('Pace (km/h)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange), ),
-                              const SizedBox(height: 10,),
-                              Text('$speed',  style: const TextStyle(fontSize: 18))
-                            ],
+                        ),
+                        const SizedBox(height: 20),
+                        Container(
+                          height: 100,
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: Colors.grey,
+                            ),
+                            borderRadius: BorderRadius.circular(10),
                           ),
+                          child: const TextField(
+                            maxLines: 4,
+                            style: TextStyle(
+                            ),
+                            decoration: InputDecoration(
+                              border: InputBorder.none,
+                              focusedBorder: InputBorder.none,
+                                prefixIcon: Icon(Icons.drive_file_rename_outline),
+                                hintText: 'Tập thể dục hằng ngày là điều thiết yếu để mang lại một cuộc sống hạnh phúc. Cố gắng duy trì đều đặn nhé!'
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20,),
+                        SizedBox(
+                          height: 60,
+                          width: double.infinity,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                children: [
+                                  const Text('Time', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
+                                  const SizedBox(height: 10,),
+                                  Text('$time', style: const TextStyle(fontSize: 18),)
+                                ],
+                              ),
+                              const VerticalDivider(color: Colors.grey, width: 2,),
+                              Column(
+                                children: [
+                                  const Text('Distance (km)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange),),
+                                  const SizedBox(height: 10, ),
+                                  Text('$distance', style: const TextStyle(fontSize: 18))
+                                ],
+                              ),
+                              const VerticalDivider(color: Colors.grey, width: 2,),
+                              Column(
+                                children: [
+                                  const Text('Pace (km/h)', style: TextStyle(fontWeight: FontWeight.bold,fontSize: 25, color: Colors.deepOrange), ),
+                                  const SizedBox(height: 10,),
+                                  Text('$speed',  style: const TextStyle(fontSize: 18))
+                                ],
+                              ),
 
-                        ],
-                      ),
-                    ),
-                    const SizedBox(height: 20,),
-                    Container(
-                      height: 50,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        // color: Colors.deepOrange,
-                        gradient: const LinearGradient(
-                          begin: Alignment.centerLeft,
-                          colors: [Colors.deepOrange, Colors.blue]
+                            ],
+                          ),
                         ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: GestureDetector(
-                        onTap: () {
-                          showDialog(
-                              context: context,
-                              builder: (context) => FractionallySizedBox(
-                                heightFactor: 0.3,
-                                widthFactor: 0.8,
-                                alignment: Alignment.center,
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    border: Border.all(color: Colors.deepOrange, width: 1),
-                                    borderRadius: BorderRadius.circular(10)
-                                  ),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.center,
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      const Text(
-                                        'Do you want to discard this activity?', style: TextStyle(fontSize: 30),
+                        const SizedBox(height: 20,),
+                        Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            // color: Colors.deepOrange,
+                            gradient: const LinearGradient(
+                              begin: Alignment.centerLeft,
+                              colors: [Colors.deepOrange, Colors.blue]
+                            ),
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: GestureDetector(
+                            onTap: () {
+                              showDialog(
+                                  context: context,
+                                  builder: (context) => FractionallySizedBox(
+                                    heightFactor: 0.3,
+                                    widthFactor: 0.8,
+                                    alignment: Alignment.center,
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: Colors.white,
+                                        border: Border.all(color: Colors.deepOrange, width: 1),
+                                        borderRadius: BorderRadius.circular(10)
                                       ),
-                                      Row(
+                                      child: Column(
+                                        crossAxisAlignment: CrossAxisAlignment.center,
+                                        mainAxisAlignment: MainAxisAlignment.center,
                                         children: [
-                                          TextButton(
-                                            onPressed: () async {
-                                              Navigator.pop(context);
-                                              Navigator.pop(context);
-                                              timeClock.onResetTimer();
-                                              dis = 0;
-                                              start = false;
-                                              exchange = false;
-                                              setZoom = false;
-                                              widget.home.changeStateOpenMap();
-                                              paths.clear();
-                                              timeIso.clear();
-                                              altitude.clear();
-                                              await controller.clearLines();
-                                            },
-                                            child: const Text('YES'),),
-                                          TextButton(
-                                            onPressed: () {
-                                              Navigator.pop(context);
-                                            },
-                                            child: const Text('NO')
+                                          const Text(
+                                            'Do you want to discard this activity?', style: TextStyle(fontSize: 30),
+                                          ),
+                                          Row(
+                                            children: [
+                                              TextButton(
+                                                onPressed: () async {
+                                                  Navigator.pop(context);
+                                                  Navigator.pop(context);
+                                                  timeClock.onResetTimer();
+                                                  home.dis = 0;
+                                                  home.start = false;
+                                                  home.exchange = false;
+                                                  setZoom = false;
+                                                  api.changeStateOpenMap();
+                                                  paths.clear();
+                                                  timeIso.clear();
+                                                  altitude.clear();
+                                                  await controller.clearLines();
+                                                },
+                                                child: const Text('YES'),),
+                                              TextButton(
+                                                onPressed: () {
+                                                  Navigator.pop(context);
+                                                },
+                                                child: const Text('NO')
+                                              )
+                                            ],
                                           )
                                         ],
-                                      )
-                                    ],
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
-                          );
-                        },
-                        child: const Center(child: Text('Discard Activity', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),)),
-                      ),
-                    )
-                  ],
+                              );
+                            },
+                            child: const Center(child: Text('Discard Activity', style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 20),)),
+                          ),
+                        )
+                      ],
+                    ),
+                  ]),
                 ),
-              ]),
-            ),
-          ),
-          Expanded(
-            flex: 1,
-            child: Align(
-                alignment: Alignment.bottomCenter,
-                child: Container(
-                    padding: const EdgeInsets.all(10),
-                    width: double.infinity,
-                    height: 70,
-                    decoration: BoxDecoration(
-                        color: Colors.grey[200],
-                        boxShadow: const [BoxShadow(color: Colors.black)]),
-                    child: InkWell(
-                      onTap: () async {
-                        Navigator.pop(context);
-                        try {
-                          String? image;
-                          await screenshotController.capture().then((value) {
-                            image = base64Encode(value!.toList());
-                          });
-
-                          Post post = PostModel.map(
-                            distance: distance,
-                            speed: distance,
-                            time: time,
-                            paths: List.from(paths),
-                            elevation: List.from(altitude),
-                            timeISO: List.from(timeIso),
-                            image: image,
-                          );
-
-                          if (image != null && timeIso.isNotEmpty) {
-                            await createGPXFile(paths, altitude, timeIso);
-                            await StravaAPIImpl().pushActivity();
-                            await widget.home.addPost(post);
-                          } else {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Error happened with your activity, do it again'))
-                            );
-                          }
-
-                          // restart state of map
-
-                          timeClock.onResetTimer();
-                          dis = 0;
-                          start = false;
-                          exchange = false;
-                          setZoom = false;
-                          widget.home.changeStateOpenMap();
-                          paths.clear();
-                          timeIso.clear();
-                          altitude.clear();
-                          await controller.clearLines();
-                        } catch(e) {
-                          log.d(e);
-                        }
-                      },
-                      child: Container(
+              ),
+              Expanded(
+                flex: 1,
+                child: Align(
+                    alignment: Alignment.bottomCenter,
+                    child: Container(
+                        padding: const EdgeInsets.all(10),
+                        width: double.infinity,
+                        height: 70,
                         decoration: BoxDecoration(
-                          color: Colors.deepOrange,
-                          borderRadius: BorderRadius.circular(5),
-                        ),
-                        child: const Center(
-                          child: Text('Save Activity',
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 20)),
-                        ),
-                      ),
+                            color: Colors.grey[200],
+                            boxShadow: const [BoxShadow(color: Colors.black)]),
+                        child: InkWell(
+                          onTap: () async {
+                            Navigator.pop(context);
+                            try {
+                              String? image;
+                              await screenshotController.capture().then((value) {
+                                image = base64Encode(value!.toList());
+                              });
+
+                              Post post = PostModel.map(
+                                distance: distance,
+                                speed: distance,
+                                time: time,
+                                paths: List.from(paths),
+                                elevation: List.from(altitude),
+                                timeISO: List.from(timeIso),
+                                image: image,
+                              );
+
+                              if (image != null && timeIso.isNotEmpty) {
+                                await createGPXFile(paths, altitude, timeIso);
+                                await StravaAPIImpl().pushActivity();
+                                await api.addPost(post);
+                              } else {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(content: Text('Error happened with your activity, do it again'))
+                                );
+                              }
+
+                              // restart state of map
+
+                              timeClock.onResetTimer();
+                              home.dis = 0;
+                              home.start = false;
+                              home.exchange = false;
+                              setZoom = false;
+                              api.changeStateOpenMap();
+                              paths.clear();
+                              timeIso.clear();
+                              altitude.clear();
+                              await controller.clearLines();
+                            } catch(e) {
+                              log.d(e);
+                            }
+                          },
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.deepOrange,
+                              borderRadius: BorderRadius.circular(5),
+                            ),
+                            child: const Center(
+                              child: Text('Save Activity',
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 20)),
+                            ),
+                          ),
+                        )
                     )
-                )
-            ),
-          )
-        ])
+                ),
+              )
+            ])
+        );
+      }
     );
   }
 

@@ -1,20 +1,23 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
+  const MyApp({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: MyAppLifecycle(),
     );
   }
 }
 
 class MyAppLifecycle extends StatefulWidget {
+  const MyAppLifecycle({super.key});
+
   @override
   _MyAppLifecycleState createState() => _MyAppLifecycleState();
 }
@@ -24,13 +27,13 @@ class _MyAppLifecycleState extends State<MyAppLifecycle> with WidgetsBindingObse
   void initState() {
     super.initState();
     // Đăng ký WidgetsBindingObserver để theo dõi vòng đời của ứng dụng
-    WidgetsBinding.instance?.addObserver(this);
+    WidgetsBinding.instance.addObserver(this);
   }
 
   @override
   void dispose() {
     // Hủy đăng ký WidgetsBindingObserver khi widget bị huỷ
-    WidgetsBinding.instance?.removeObserver(this);
+    WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
 
@@ -64,9 +67,9 @@ class _MyAppLifecycleState extends State<MyAppLifecycle> with WidgetsBindingObse
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('App Lifecycle'),
+        title: const Text('App Lifecycle'),
       ),
-      body: Center(
+      body: const Center(
         child: Text('App Lifecycle Demo'),
       ),
     );

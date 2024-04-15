@@ -14,6 +14,7 @@ import 'package:stravaclone/features/domain/usecase/get_data_post.dart';
 import 'package:stravaclone/features/domain/usecase/get_data_spotify.dart';
 import 'package:stravaclone/features/domain/usecase/get_data_weather.dart';
 import 'package:stravaclone/features/presentation/pages/home/home.dart';
+import 'package:stravaclone/features/presentation/state/map_state.dart';
 
 import '/features/presentation/support/firebase_options.dart';
 
@@ -60,6 +61,10 @@ void main() async {
       Provider.value(
         value: getDataPost
       ),
+      ChangeNotifierProvider(
+          create: (_) => MapState(),
+      )
+
     ],
     child: const MaterialApp(
       debugShowCheckedModeBanner: false,

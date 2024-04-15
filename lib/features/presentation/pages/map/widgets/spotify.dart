@@ -62,7 +62,7 @@ class _HomeState extends State<SpotifyAPI> {
               redirectUrl: 'stravaflutter://redirect',
               scope: 'user-library-modify user-library-read user-read-email user-read-private playlist-modify-public user-top-read'
           );
-          SpotifySdk.connectToSpotifyRemote(
+          await SpotifySdk.connectToSpotifyRemote(
               clientId: '47ddd41f0b974c40892de24a73dac073',
               redirectUrl: 'stravaflutter://redirect'
           );
@@ -202,7 +202,8 @@ class _HomeState extends State<SpotifyAPI> {
                       children: [
                         Selector<PlayerState, Map<String, dynamic>?>(
                           builder: (context, newValue, child) {
-                            if(newValue == null) return Container(
+                            if(newValue == null) {
+                              return Container(
                                 decoration: BoxDecoration(borderRadius: BorderRadius.circular(10)),
                                 height: 100,
                                 width: 100,
@@ -211,6 +212,7 @@ class _HomeState extends State<SpotifyAPI> {
                                     child: Image.asset('asset/image/jb.jpg')
                                 )
                             );
+                            }
                             return ImageFromUri(uri: ImageUri.fromJson(newValue));
                           },
                           selector: (context , value) => value.track?.imageUri.toJson(), // phải đưa về dạng json vì để imageuri thì khi mình thêm vào thư viện yêu thích thì nó vẫn tính là imageuri thay đổi
