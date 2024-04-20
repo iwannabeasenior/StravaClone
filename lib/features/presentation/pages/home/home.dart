@@ -5,10 +5,12 @@ import 'package:provider/provider.dart';
 import 'package:stravaclone/helper/font/Post.dart' as icon;
 import 'package:stravaclone/features/domain/usecase/get_data_post.dart';
 import 'package:stravaclone/features/presentation/pages/home/widgets/profile_main.dart';
+import 'package:stravaclone/helper/font/task_icon.dart';
 import 'package:vietmap_flutter_gl/vietmap_flutter_gl.dart';
 import '../../../domain/entity/post.dart';
 import '../map/vietmap.dart';
 import '../../state/home_state.dart';
+import '../task/task_page.dart';
 import 'widgets/notification.dart';
 
 class HomePage extends StatelessWidget {
@@ -43,7 +45,13 @@ class _HomeState extends State<Home> {
           appBar: AppBar(
             backgroundColor: Colors.deepOrange,
             actions: [
-
+              IconButton(
+                onPressed: () {
+                  // Navigator.pushNamed(context, '/TaskPage');
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => const TaskFather()));
+                },
+                icon: const Icon(TaskIcon.tasks),
+              ),
               IconButton(
                 onPressed: () {
                   Navigator.push(context, MaterialPageRoute(builder: (context) {

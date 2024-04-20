@@ -5,18 +5,21 @@ import 'package:flutter/material.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:stravaclone/features/data/repositories/post_repository_impl.dart';
+import 'package:stravaclone/features/data/repositories/task_repository_impl.dart';
 import 'package:stravaclone/features/data/repositories/track_repository_impl.dart';
 import 'package:stravaclone/features/data/repositories/weather_repository_impl.dart';
 import 'package:stravaclone/features/data/source/local/local_storage_posts.dart';
+import 'package:stravaclone/features/data/source/local/local_storage_task.dart';
 import 'package:stravaclone/features/data/source/network/spotify_api.dart';
 import 'package:stravaclone/features/data/source/network/weather_api.dart';
 import 'package:stravaclone/features/domain/usecase/get_data_post.dart';
 import 'package:stravaclone/features/domain/usecase/get_data_spotify.dart';
 import 'package:stravaclone/features/domain/usecase/get_data_weather.dart';
-import 'package:stravaclone/features/presentation/pages/home/home.dart';
 import 'package:stravaclone/features/presentation/state/map_state.dart';
+import 'package:stravaclone/helper/routes.dart';
 
 import '/features/presentation/support/firebase_options.dart';
+import 'features/domain/usecase/get_data_task.dart';
 
 // create new file named "gpxFake.gpx" to save activity
 void createSaveFile() async {
@@ -50,6 +53,8 @@ void main() async {
   //weather
   GetDataWeather getDataWeather = GetDataWeather(repository: WeatherRepositoryImpl(api: WeatherAPIImpl()));
 
+  GetDataTask getDataTask = GetDataTask(repo: TaskRepositoryImpl(localStorage: LocalStorageTaskImpl()));
+
   runApp(MultiProvider(
     providers: [
       Provider.value(
@@ -61,14 +66,23 @@ void main() async {
       Provider.value(
         value: getDataPost
       ),
+
+      Provider.value(
+        value: getDataTask,
+      ),
       ChangeNotifierProvider(
           create: (_) => MapState(),
       )
 
     ],
-    child: const MaterialApp(
+
+    child: MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SafeArea(child: HomePage()),
+      // home: SafeArea(child: HomePage()),
+      routes: Routes.routes(),
+      onGenerateRoute: (settings) => Routes.onGenerateRoute(settings),
+      onUnknownRoute: (settings) => Routes.onUnknownRoute(settings),
+      initialRoute: 'HomePage',
     ),
   ));
 }

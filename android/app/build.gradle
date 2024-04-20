@@ -31,7 +31,7 @@ android {
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
-
+        coreLibraryDesugaringEnabled true
     }
 
     kotlinOptions {
@@ -51,6 +51,7 @@ android {
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
         minSdkVersion 24 // old is 21
         compileSdkVersion 34
+        multiDexEnabled true
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
@@ -79,5 +80,6 @@ flutter {
 dependencies {
     implementation project(':spotify-app-remote')
     implementation "com.google.code.gson:gson:2.10.1"
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:1.2.2'
 }
 apply plugin : "com.google.gms.google-services"

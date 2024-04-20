@@ -59,7 +59,6 @@ dependencies:
   spotify_sdk: ^3.0.0-dev.2
   flutter_dotenv: ^5.1.0
   logger: ^2.0.2+1
-  vietmap_flutter_gl: ^1.2.6
   firebase_storage: ^11.5.5
   screenshot: ^2.1.0
   equatable: ^2.0.5
@@ -69,7 +68,8 @@ dependencies:
   flutter_appauth: ^6.0.5
   page_transition: ^2.1.0
   flutter_blue_plus: ^1.32.1
-  vietmap_flutter_navigation: ^1.5.4
+  vietmap_flutter_plugin: ^0.1.4
+  vietmap_flutter_gl: ^1.2.6
 
 dev_dependencies:
   flutter_test:
@@ -111,6 +111,9 @@ flutter:
     - family: Location
       fonts:
         - asset: asset/font/Location.ttf
+    - family: Task
+      fonts:
+        - asset: asset/font/Task.ttf
 
   # To add assets to your application, add an assets section, like this:
   # assets:
